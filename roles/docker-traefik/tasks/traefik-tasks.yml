@@ -48,18 +48,24 @@
     state: started
     restart: "{{ _traefik_restart_notified | default(false) | bool }}"
     restart_policy: "{{ traefik_container_restart_policy }}"
-    mounts:
-      - type: bind
-        source: "{{ traefik_static_config_file_path }}"
-        target: /etc/traefik/traefik.yml
-      - type: bind
-        source: "{{ traefik_dynamic_config_dir }}"
-        target: /etc/traefik/dynamic
-      - type: bind
-        source: "{{ traefik_ssl_certs_location }}"
-        target: /etc/traefik/certs
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
+    mounts: >-
+      {{ mounts_always + mount_docker_sock
+         if traefik_use_docker_labels
+         else mounts_always }}
     ports: "{{ _traefik_external_ports }}"
     container_default_behavior: no_defaults
+  vars:
+    mounts_always:
+    - type: bind
+      source: "{{ traefik_static_config_file_path }}"
+      target: /etc/traefik/traefik.yml
+    - type: bind
+      source: "{{ traefik_dynamic_config_dir }}"
+      target: /etc/traefik/dynamic
+    - type: bind
+      source: "{{ traefik_ssl_certs_location }}"
+      target: /etc/traefik/certs
+    mount_docker_sock:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock

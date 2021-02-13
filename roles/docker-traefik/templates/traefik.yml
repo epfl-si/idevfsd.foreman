@@ -23,12 +23,13 @@ providers:
   file:
     directory: /etc/traefik/dynamic
     watch: true
+{% if traefik_use_docker_labels %}
   # Watch /var/run/docker/docker.sock for creation/removal of labeled
   # containers; deduce Træfik configuration therefrom
   docker:
-    # In the future, we want to be able to choose between Docker labels
-    # and YAML-based configuration for routing.
+    # No labels means no (accidental) exposure
     exposedByDefault: false
+{% endif %}
 
 entryPoints:
   web_redirect:
