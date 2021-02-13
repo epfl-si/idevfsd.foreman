@@ -13,6 +13,7 @@
       {{ lookup("template", item | basename) }}
   with_items:
     - database.yml
+  register: _foreman_configuration_files
 
 - name: "`rake db:migrate` (schema creation / upgrade)"
   docker_container:
@@ -58,6 +59,14 @@
     image: "{{ foreman_frontend_image }}"
     detach: yes
     restart_policy: unless-stopped
+    state: started
+    restart: >-
+      {{ (_foreman_configuration_files is defined)
+         and
+         _foreman_configuration_files.results
+         and
+         (_foreman_configuration_files.results | any("changed"))
+      }}
     log_driver: json-file
     log_options:
       max-size: 50m
