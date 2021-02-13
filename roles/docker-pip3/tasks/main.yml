@@ -1,0 +1,29 @@
+- name: Install PIP3
+  ## When your dependencies (Ansible's `yum` task) have dependencies
+  ## that need dependencies (pip3) to be installed ... Ugh
+  shell:
+    cmd: |
+      set -e -x
+      if which pip3; then
+        echo NOCHANGE
+        exit 0
+      fi
+      {% if ansible_facts["distribution"] in ["Debian", "Ubuntu"] %}
+      apt -qy install python3-pip
+      {% elif ansible_facts["distribution"] in ["RedHat", "CentOS"] %}
+      yum -y install python3-pip
+      {% else %}
+      echo "No idea how to install pip3 on {{ ansible_facts["distribution"] }}, sorry"
+      exit 1
+      {% endif %}
+  register: _docker_ansible_install_pip3
+  changed_when: >-
+    (_docker_ansible_install_pip3 is defined) and
+    ("NOCHANGE" not in (_docker_ansible_install_pip3.stdout | default("")))
+
+- name: Install the Python APIs for Docker
+  pip:
+    executable: pip3
+    name:
+      - docker
+    state: latest
