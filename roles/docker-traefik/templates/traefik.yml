@@ -8,6 +8,10 @@ log:
   level: DEBUG
 {% endif %}
 
+{% if traefik_produce_access_logs %}
+accessLog: {}
+{% endif %}
+
 # API is always open on port 8080, but you don't have to expose it
 api:
   insecure: true

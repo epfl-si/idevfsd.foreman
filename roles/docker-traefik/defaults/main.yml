@@ -10,6 +10,7 @@ traefik_container_restart_policy: "always"
 
 ## Feature flags
 traefik_use_docker_labels: true
+traefik_produce_access_logs: true
 traefik_debug: false
 
 ## If you pre-populate these files, the role won't override them.
