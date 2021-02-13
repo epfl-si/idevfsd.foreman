@@ -48,6 +48,10 @@
     state: started
     restart: "{{ _traefik_restart_notified | default(false) | bool }}"
     restart_policy: "{{ traefik_container_restart_policy }}"
+    log_driver: json-file
+    log_options:
+      max-size: "{{ traefik_log_max_size }}"
+      max-file: "{{ traefik_log_rotate_keep_number | string }}"
     mounts: >-
       {{ mounts_always + mount_docker_sock
          if traefik_use_docker_labels

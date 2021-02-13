@@ -13,6 +13,9 @@ traefik_use_docker_labels: true
 traefik_produce_access_logs: true
 traefik_debug: false
 
+traefik_log_max_size: 50m
+traefik_log_rotate_keep_number: 3
+
 ## If you pre-populate these files, the role won't override them.
 traefik_ssl_certs_location: "{{ traefik_root_location }}/certs"
 traefik_ssl_keys_location: "{{ traefik_root_location }}/certs/private"
