@@ -1,0 +1,28 @@
+## There is no default for the following variables, and the
+## playbook must define these:
+## - traefik_root_location
+
+traefik_docker_image: "traefik:v2.4"
+traefik_container_name: traefik
+traefik_static_config_file_path: "{{ traefik_root_location }}/conf/traefik.yml"
+traefik_dynamic_config_dir: "{{ traefik_root_location }}/conf/dynamic"
+traefik_container_restart_policy: "always"
+
+## Feature flags
+traefik_use_docker_labels: true
+traefik_debug: false
+
+## If you pre-populate these files, the role won't override them.
+traefik_ssl_certs_location: "{{ traefik_root_location }}/certs"
+traefik_ssl_keys_location: "{{ traefik_root_location }}/certs/private"
+traefik_ssl_key_path: "{{ traefik_ssl_keys_location }}/key.pem"
+traefik_ssl_cert_path: "{{ traefik_ssl_certs_location }}/cert.pem"
+
+## traefik_external_http_port is not defined by default. If it is,
+## then it 302's everything to traefik_https_port.
+traefik_external_https_port: 443
+
+traefik_rsa_key_size: 2048
+traefik_certificate_selfsigned_subject: "/CN=traefik"
+traefik_certificate_selfsigned: true
+traefik_certificate_selfsigned_validity_days: 3650

@@ -1,0 +1,65 @@
+# Set up Traefik on the serving VM
+
+- name: Traefik directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ traefik_root_location }}"
+    - "{{ traefik_static_config_file_path | dirname }}"
+    - "{{ traefik_dynamic_config_dir }}"
+
+- name: Træefik certificate
+  include_tasks:
+    file: traefik-certificate.yml
+    apply:
+      tags:
+        - traefik
+        - traefik.certificate
+  tags:
+    - traefik
+    - traefik.certificate
+
+- name: "Traefik static configuration"
+  template:
+    src: "traefik.yml"
+    dest: "{{ traefik_static_config_file_path }}"
+  notify: restart traefik
+
+- name: "Traefik dynamic configuration (general)"
+  template:
+    src: "traefik-dynamic-general.yml"
+    dest: "{{ traefik_dynamic_config_dir }}/traefik-dynamic-general.yml"
+
+- name: "{{ traefik_docker_image }} Docker image"
+  docker_image:
+    name: "{{ traefik_docker_image }}"
+    state: present
+    source: pull
+
+- meta: flush_handlers  ##################################################
+
+- name: Start or restart traefik container
+  docker_container:
+    name: "{{ traefik_container_name }}"
+    image: "{{ traefik_docker_image }}"
+    command:
+      --api
+    state: started
+    restart: "{{ _traefik_restart_notified | default(false) | bool }}"
+    restart_policy: "{{ traefik_container_restart_policy }}"
+    mounts:
+      - type: bind
+        source: "{{ traefik_static_config_file_path }}"
+        target: /etc/traefik/traefik.yml
+      - type: bind
+        source: "{{ traefik_dynamic_config_dir }}"
+        target: /etc/traefik/dynamic
+      - type: bind
+        source: "{{ traefik_ssl_certs_location }}"
+        target: /etc/traefik/certs
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    ports: "{{ _traefik_external_ports }}"
+    container_default_behavior: no_defaults

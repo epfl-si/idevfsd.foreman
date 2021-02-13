@@ -1,0 +1,5 @@
+---
+
+- name: restart traefik
+  set_fact:
+    _traefik_restart_notified: true

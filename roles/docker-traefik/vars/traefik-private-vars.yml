@@ -1,0 +1,12 @@
+_traefik_external_ports: >-
+  {{
+      [ _traefik_external_port__https, _traefik_external_port__http ]
+      if traefik_external_http_port is defined
+    else [ _traefik_external_port__https ]
+  }}
+
+_traefik_external_port__http: >-
+    {{ traefik_external_http_port |
+       default("ERROR in role docker-traefik: you should not see this")
+    }}:80
+_traefik_external_port__https:  "{{ traefik_external_https_port }}:443"

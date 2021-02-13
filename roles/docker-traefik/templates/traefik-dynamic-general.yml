@@ -1,0 +1,40 @@
+# -*- mode: yaml; -*-
+#
+# General-purpose configuration (independent from back-ends)
+# which Træfik insists should be dynamic
+
+tls:
+    certificates:
+      - certFile: "/etc/traefik/certs/{{ traefik_ssl_cert_path | basename }}"
+        keyFile: "/etc/traefik/certs/private/{{ traefik_ssl_key_path | basename }}"
+
+{% if traefik_debug %}
+http:
+  routers:
+    debugonly-api:
+      priority: 100
+      entrypoints:
+        - websecure
+      rule: "PathPrefix(`/api`)"
+      service: api@internal
+    debugonly-dashboard:
+      priority: 100
+      entrypoints:
+        - websecure
+      rule: "PathPrefix(`/dashboard`)"
+      service: dashboard@internal
+      middlewares:
+        - debugonly-dashboard-redirect
+        - debugonly-dashboard-stripprefix
+  middlewares:
+    debugonly-dashboard-redirect:
+      redirectRegex:
+        regex: "(.*)/dashboard($|[?])"
+        replacement: "${1}/dashboard/${2}"
+        permanent: true
+    debugonly-dashboard-stripprefix:
+      stripPrefix:
+        prefixes:
+          - /dashboard/
+          - /dashboard
+{% endif %}

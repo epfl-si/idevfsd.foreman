@@ -1,0 +1,45 @@
+# -*- mode: yaml; -*-
+
+# So-called "static" configuration for Træfik.
+# Tweaking something here requires a restart.
+
+{% if traefik_debug %}
+log:
+  level: DEBUG
+{% endif %}
+
+# API is always open on port 8080, but you don't have to expose it
+api:
+  insecure: true
+  dashboard: true
+
+metrics:
+  prometheus: {}
+
+# So-called “dynamic” configuration providers, which feed in
+# the rest of the configuration
+providers:
+  # Dynamic configuration in files
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+  # Watch /var/run/docker/docker.sock for creation/removal of labeled
+  # containers; deduce Træfik configuration therefrom
+  docker:
+    # In the future, we want to be able to choose between Docker labels
+    # and YAML-based configuration for routing.
+    exposedByDefault: false
+
+entryPoints:
+  web_redirect:
+    address: ":80"
+    http:
+      # https://doc.traefik.io/traefik/v2.2/routing/entrypoints/#redirection
+      redirections:
+        entryPoint:
+          to: ":{{ traefik_external_https_port }}"
+
+  websecure:
+    address: ":443"
+    http:
+      tls: {}
