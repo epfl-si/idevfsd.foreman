@@ -1,0 +1,11 @@
+- name: Docker API dependencies on the remote host
+  hosts: all
+  roles:
+    - role: roles/docker-pip3
+
+- name: Foreman server
+  hosts:
+    - itsidevfsd0005
+  gather_facts: no   # We don't use them
+  roles:
+    - role: roles/foreman-idevfsd

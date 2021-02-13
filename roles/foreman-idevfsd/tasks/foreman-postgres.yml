@@ -1,0 +1,47 @@
+- name: "PostgreSQL directories"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ foreman_postgres_socket_dir }}"
+    - "{{ foreman_postgres_storage_dir }}"
+
+- name: "PostgreSQL data initialization script"
+  copy:
+    dest: "{{ foreman_postgres_initdb_sql_script }}"
+    content: >-
+      {{ lookup("template", "initdb.sql" ) }}
+
+- name: 'PostgreSQL database'
+  docker_container:
+    name: "postgresql_{{ inventory_environment }}"
+    image: "{{ foreman_postgres_image }}"
+    detach: yes
+    restart_policy: unless-stopped
+    log_driver: json-file
+    log_options:
+      max-size: 50m
+      max-file: "3"
+    mounts: "{{ mounts[inventory_environment] }}"
+    env:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    container_default_behavior: no_defaults
+  vars:
+    mounts:
+      staging: [] ## This space intentionally left blank
+      prod:
+        - "{{ socket_volume }}"
+        - "{{ storage_volume }}"
+        - "{{ initdb_volume }}"
+    socket_volume:
+      type: bind
+      source: "{{ foreman_postgres_socket_dir }}"
+      target: /run/postgresql
+    storage_volume:
+      type: bind
+      source: "{{ foreman_postgres_storage_dir }}"
+      target: /var/lib/postgresql/data
+    initdb_volume:
+      type: bind
+      source: "{{ foreman_postgres_initdb_sql_script }}"
+      target: /docker-entrypoint-initdb.d/foreman-initdb.sql

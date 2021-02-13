@@ -1,0 +1,66 @@
+- name: "Directories"
+  file:
+    state: directory
+    recurse: yes
+    path: "{{ item }}"
+  with_items:
+    - "{{ foreman_frontend_config_dir }}"
+
+- name: "Foreman configuration files"
+  copy:
+    dest: "{{ foreman_frontend_config_dir }}/{{ item }}"
+    content: >-
+      {{ lookup("template", item | basename) }}
+  with_items:
+    - database.yml
+
+- name: "`rake db:migrate` (schema creation / upgrade)"
+  docker_container:
+    name: "foreman_{{ inventory_environment }}_db_migrate"
+    image: "{{ foreman_frontend_image }}"
+    detach: no
+    cleanup: yes
+    mounts: "{{ foreman_frontend_mounts }}"
+    command:
+      - bundle
+      - exec
+      - bin/rake
+      - db:migrate
+    container_default_behavior: no_defaults
+  register: _foreman_db_migrate
+  changed_when: >-
+    (_foreman_db_migrate is defined)
+    and
+    (_foreman_db_migrate.container is defined)
+    and
+    (_foreman_db_migrate.container.Output is defined)
+    and
+    ("migrated" in _foreman_db_migrate.container.Output)
+
+- name: "`rake db:seed` (populate initial data)"
+  when: _foreman_db_migrate is changed
+  docker_container:
+    name: "foreman_{{ inventory_environment }}_db_seed"
+    image: "{{ foreman_frontend_image }}"
+    detach: no
+    cleanup: yes
+    mounts: "{{ foreman_frontend_mounts }}"
+    command:
+      - bundle
+      - exec
+      - bin/rake
+      - db:seed
+    container_default_behavior: no_defaults
+
+- name: "Foreman front-end"
+  docker_container:
+    name: "{{ foreman_frontend_container_name }}"
+    image: "{{ foreman_frontend_image }}"
+    detach: yes
+    restart_policy: unless-stopped
+    log_driver: json-file
+    log_options:
+      max-size: 50m
+      max-file: "3"
+    mounts: "{{ foreman_frontend_mounts }}"
+    container_default_behavior: no_defaults

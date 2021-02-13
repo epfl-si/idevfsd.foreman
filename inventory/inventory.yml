@@ -1,0 +1,8 @@
+## Single-file inventory (no distinction between test and production)
+all:
+  hosts:
+    itsidevfsd0005:
+      inventory_environment: prod
+      ansible_host: itsidevfsd0005.xaas.epfl.ch
+      ansible_user: root
+      ansible_python_interpreter: python3

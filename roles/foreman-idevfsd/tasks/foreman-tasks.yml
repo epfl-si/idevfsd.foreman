@@ -1,0 +1,20 @@
+- include_vars: foreman-vars.yml
+  tags: always
+
+- name: "Foreman PostgreSQL database"
+  include_tasks:
+    file: foreman-postgres.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.postgres
+  tags:
+    - foreman
+    - foreman.postgres
+
+- name: "Foreman front-end server"
+  import_tasks:
+    file: foreman-frontend.yml
+  tags:
+    - foreman
+    - foreman.frontend

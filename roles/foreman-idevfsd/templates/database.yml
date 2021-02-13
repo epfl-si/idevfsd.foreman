@@ -1,0 +1,8 @@
+{# Foreman config/database.yml file #}
+production:
+  adapter: postgresql
+  host: /run/postgres
+  port: 5432
+  database : foreman
+  encoding: utf8
+  pool: 10
