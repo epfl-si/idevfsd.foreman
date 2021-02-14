@@ -18,3 +18,10 @@
   tags:
     - foreman
     - foreman.frontend
+
+- name: "Foreman configuration"
+  import_tasks:
+    file: foreman-config.yml
+  tags:
+    - foreman
+    - foreman.config

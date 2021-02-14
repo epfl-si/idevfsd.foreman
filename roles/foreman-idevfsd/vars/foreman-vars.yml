@@ -19,3 +19,19 @@ foreman_frontend_mounts:
   - type: bind
     source: "{{ foreman_frontend_config_dir }}/settings.yaml"
     target: /home/foreman/config/settings.yaml
+
+foreman_docker_rails_interpreter:
+  - docker
+  - exec
+  - "-i"
+  - "{{ foreman_frontend_container_name }}"
+  - bundle
+  - exec
+  - rails
+  - console
+
+foreman_keybase_credentials_file: /keybase/team/epfl_idevfsd/foreman/credentials.yml
+_foreman_keybase_credentials: >-
+  {{ lookup("file", foreman_keybase_credentials_file) | from_yaml }}
+foreman_admin_user: "{{ _foreman_keybase_credentials.foreman_web_ui.login }}"
+foreman_admin_password: "{{ _foreman_keybase_credentials.foreman_web_ui.password }}"

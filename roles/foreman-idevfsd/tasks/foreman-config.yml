@@ -1,0 +1,10 @@
+- name: "Administrator password"
+  rails_script:
+    interpreter: "{{ foreman_docker_rails_interpreter }}"
+    postcondition: |
+      User::try_to_login "{{ foreman_admin_user }}", "{{ foreman_admin_password }}"
+    action: |
+      admin = User.unscoped.find_by_login "{{ foreman_admin_user }}"
+      admin.upgrade_password "{{ foreman_admin_password }}"
+      admin.save
+    recheck: yes
