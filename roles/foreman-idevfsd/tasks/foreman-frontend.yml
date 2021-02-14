@@ -13,6 +13,7 @@
       {{ lookup("template", item | basename) }}
   with_items:
     - database.yml
+    - settings.yaml
   register: _foreman_configuration_files
 
 - name: "`rake db:migrate` (schema creation / upgrade)"
@@ -53,7 +54,7 @@
       - db:seed
     container_default_behavior: no_defaults
 
-- name: "Foreman front-end"
+- name: "Foreman front-end running in Docker"
   docker_container:
     name: "{{ foreman_frontend_container_name }}"
     image: "{{ foreman_frontend_image }}"
@@ -72,4 +73,11 @@
       max-size: 50m
       max-file: "3"
     mounts: "{{ foreman_frontend_mounts }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.foreman.rule: >-
+        PathPrefix(`/`)
+    env:
+      FOREMAN_ENV: production
+      FOREMAN_BIND: tcp://0.0.0.0:3000
     container_default_behavior: no_defaults

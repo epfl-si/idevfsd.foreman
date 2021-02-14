@@ -1,0 +1,5 @@
+{# Foreman config/settings.yaml file
+ # See https://theforeman.org/manuals/2.3/index.html#3.5.2ConfigurationOptions
+ -#}
+---
+:foreman_url: https://{{ ansible_facts['fqdn'] }}:{{ traefik_external_https_port }}/

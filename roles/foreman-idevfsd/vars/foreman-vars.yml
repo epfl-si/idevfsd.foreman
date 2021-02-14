@@ -16,3 +16,6 @@ foreman_frontend_mounts:
   - type: bind
     source: "{{ foreman_frontend_config_dir }}/database.yml"
     target: /home/foreman/config/database.yml
+  - type: bind
+    source: "{{ foreman_frontend_config_dir }}/settings.yaml"
+    target: /home/foreman/config/settings.yaml
