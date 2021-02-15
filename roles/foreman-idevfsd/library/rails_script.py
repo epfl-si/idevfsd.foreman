@@ -133,9 +133,9 @@ require 'json'
 
 def exit_json(**args)
   args["_from_"] = "rails_script"
-  print
+  print "\n"
   print args.to_json
-  print
+  print "\n"
   exit
 end
 
