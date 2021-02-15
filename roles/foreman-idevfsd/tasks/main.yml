@@ -1,6 +1,5 @@
 - include_vars: foreman-vars.yml
   tags: always
 
-- import_tasks: foreman-tasks.yml
-  tags:
-    - foreman
+- include_tasks: foreman-tasks.yml
+  tags: always
