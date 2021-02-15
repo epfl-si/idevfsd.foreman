@@ -5,6 +5,25 @@
     path: "{{ item }}"
   with_items:
     - "{{ foreman_frontend_config_dir }}"
+    - "{{ foreman_frontend_build_dir }}"
+  tags: foreman.frontend.image
+
+- name: "{{ foreman_frontend_build_dir }}/Dockerfile"
+  copy:
+    dest: "{{ foreman_frontend_build_dir }}/Dockerfile"
+    content: >-
+      {{ lookup("template", "Dockerfile") }}
+  tags: foreman.frontend.image
+
+- name: "{{ foreman_frontend_image }}"
+  docker_image:
+    name: "{{ foreman_frontend_image }}"
+    source: build
+    force_source: yes
+    build:
+      pull: no     # Don't re-pull
+      path: '{{ foreman_frontend_build_dir }}'
+  tags: foreman.frontend.image
 
 - name: "Foreman configuration files"
   copy:

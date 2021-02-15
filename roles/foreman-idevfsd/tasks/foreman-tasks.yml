@@ -10,11 +10,16 @@
     - foreman.postgres
 
 - name: "Foreman front-end server"
-  import_tasks:
+  include_tasks:
     file: foreman-frontend.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.frontend
   tags:
     - foreman
     - foreman.frontend
+    - foreman.frontend.image
 
 - name: "Foreman configuration"
   import_tasks:
