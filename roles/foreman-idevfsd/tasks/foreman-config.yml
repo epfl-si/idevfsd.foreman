@@ -8,3 +8,15 @@
       admin.upgrade_password "{{ foreman_admin_password }}"
       admin.save
     recheck: yes
+
+- name: "Ubuntu 20.04"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.operatingsystem:
+    name: Ubuntu
+    release_name: focal
+    family: Debian
+    major: "20"
+    minor: "04"
+    password_hash: SHA256
+  tags:
+    - foreman.config.os

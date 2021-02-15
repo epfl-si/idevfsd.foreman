@@ -22,8 +22,13 @@
     - foreman.frontend.image
 
 - name: "Foreman configuration"
-  import_tasks:
+  include_tasks:
     file: foreman-config.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.config
   tags:
     - foreman
     - foreman.config
+    - foreman.config.os
