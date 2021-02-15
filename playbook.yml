@@ -25,3 +25,12 @@
     - role: roles/foreman-idevfsd
   vars_files:
     - vars/global-vars.yml
+
+- name: Foreman remastered discovery image
+  hosts:
+    - itsidevfsd0005
+  gather_facts: no
+  roles:
+    - role: roles/foreman-discovery-remaster
+  vars_files:
+    - vars/global-vars.yml

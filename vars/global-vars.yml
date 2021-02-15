@@ -1,1 +1,2 @@
 traefik_external_https_port: 7443
+foreman_frontend_url: https://itsidevfsd0005.xaas.epfl.ch:{{ traefik_external_https_port }}/

@@ -1,0 +1,10 @@
+- name: Foreman discovery image remastering tools (RedHat-like OSes)
+  when: ansible_facts["os_family"] == "RedHat"
+  include_tasks: install-rpm.yml
+  vars:
+    rpm: "{{ item }}"
+  with_items:
+    - libguestfs-tools    # for guestmount
+    - genisoimage         # mkisofs
+    - syslinux            # isohybrid
+    - isomd5sum           # implantisomd5

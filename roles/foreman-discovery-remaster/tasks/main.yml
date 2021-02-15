@@ -1,0 +1,5 @@
+- include_vars: discovery-remaster-vars.yml
+  tags: always
+
+- include_tasks: discovery-remaster-tasks.yml
+  tags: always

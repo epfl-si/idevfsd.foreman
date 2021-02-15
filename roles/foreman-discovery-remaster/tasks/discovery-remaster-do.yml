@@ -1,0 +1,22 @@
+- name: "Ensure that {{ discovery_source_image }} is present"
+  changed_when: false
+  shell:
+    cmd: |
+      if test -f "{{ discovery_source_image }}"; then exit 0; fi
+
+      cat >&2 <<MESSAGE
+      Please ensure that {{ discovery_source_image }} is available, e.g. with
+
+      mount -t cifs -o username=YOURGASPARLOGIN //nassvmmix01.epfl.ch/si_vsissp_iso_priv_repo_p01_app/ITServices/its_idevfsd {{ discovery_source_image | dirname }}
+
+      MESSAGE
+
+      exit 1
+
+- name: "Run discovery-remaster"
+  shell:
+    creates: "{{ discovery_remastered_image }}"
+    cmd: |
+      discovery-remaster "{{ discovery_source_image }}" \
+         'proxy.url={{ foreman_frontend_url }} proxy.type=foreman' \
+         "{{ discovery_remastered_image }}"

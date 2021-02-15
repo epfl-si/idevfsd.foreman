@@ -1,0 +1,13 @@
+# This is what passes for adequate upward compatibility in Ansible-land:
+# https://github.com/ansible/ansible/issues/67083#issuecomment-582000464
+# The short of it is that you can't use a `yum`, `dnf` or `package` task with
+# Python 3 and CentOS 7, full stop
+- name: Install {{ rpm }} RPM
+  shell:
+    cmd: |
+      if rpm -qi {{ rpm }}; then echo NOCHANGE; exit 0; fi
+      yum -y install {{ rpm }}
+  register: _install_rpm
+  changed_when: >-
+    (_install_rpm is defined) and
+    ("NOCHANGE" not in (_install_rpm.stdout | default("")))
