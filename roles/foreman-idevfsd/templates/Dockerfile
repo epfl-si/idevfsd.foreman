@@ -11,13 +11,22 @@ RUN microdnf install findutils && microdnf clean all
 # The foreman_ansible plugin requires native extensions:
 RUN set -e -x; \
   rpm -qa --queryformat '%{NAME}\n' | sort > /dev/shm/packages; \
-  microdnf install ruby-devel glibc-devel gcc; \
+  microdnf install redhat-rpm-config git \
+    gcc-c++ make bzip2 gettext tar \
+    libxml2-devel libcurl-devel ruby-devel \
+    postgresql-devel; \
   su -l -s /bin/bash foreman -c " \
   set -e -x; \
   export PATH=/home/foreman/bin:$PATH; \
   echo "\""gem 'foreman_ansible'"\"" > bundler.d/foreman_ansible.rb; \
-  bundle install" ; \
-  rpm -e $(rpm -qa --queryformat '%{NAME}\n' | sort | comm -1 -3 /dev/shm/packages -)
+  bundle install; \
+  npm install --no-optional; \
+  ./node_modules/webpack/bin/webpack.js --config config/webpack.config.js ; \
+  npm run analyze ; \
+  rm -rf public/webpack/stats.json ./node_modules vendor/ruby/*/cache vendor/ruby/*/gems/*/node_modules bundler.d/nulldb.rb db/schema.rb; \
+  bundle install --without "\"'${BUNDLER_SKIPPED_GROUPS}'\"" assets"; \
+  rpm -e $(rpm -qa --queryformat '%{NAME}\n' | sort | comm -1 -3 /dev/shm/packages -); \
+  microdnf clean all
 
 USER 1001
 
