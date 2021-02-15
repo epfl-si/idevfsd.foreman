@@ -1,6 +1,9 @@
 FROM {{ foreman_frontend_base_image }}
 MAINTAINER IDEV-FSD <idev-fsd@groupes.epfl.ch>
 
+## https://stackoverflow.com/a/7662245/435004
+RUN echo 'gem: --no-document' >> ~/.gemrc
+
 USER 0
 # Just for comfort (M-x grep-find):
 RUN microdnf install findutils && microdnf clean all
