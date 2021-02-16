@@ -1,0 +1,17 @@
+#####################
+# Foreman inventory #
+#####################
+# In this file, we list the VMs that IDEV-FSD Foreman has the
+# authority to reinstall.
+
+############## idevfsdesis ################
+
+itsidevfsd0009:
+  macaddress: 00:50:56:84:39:3b
+  ip: 10.95.80.81
+  hostgroup: idevfsdesis
+
+itsidevfsd0010:
+  macaddress: 00:50:56:84:d6:a8
+  ip: 10.95.80.84
+  hostgroup: idevfsdesis

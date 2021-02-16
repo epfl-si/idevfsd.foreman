@@ -36,3 +36,4 @@
     - foreman.config.hostgroup
     - foreman.config.domain
     - foreman.config.subnets
+    - foreman.config.rules
