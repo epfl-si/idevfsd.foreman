@@ -33,7 +33,26 @@
     - foreman
     - foreman.config
     - foreman.config.os
-    - foreman.config.hostgroup
-    - foreman.config.domain
-    - foreman.config.subnets
-    - foreman.config.rules
+
+- include_vars:
+    name: foreman_inventory
+    file: "../../../managed-inventory.yml"
+  tags:
+    - foreman
+    - foreman.inventory
+
+- name: "Foreman host groups"
+  include_tasks:
+    file: _hostgroup.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.inventory
+  vars:
+    hostgroup: "{{ foreman_inventory[hostgroup_name] }}"
+  with_items: "{{ foreman_inventory.keys() }}"
+  loop_control:
+    loop_var: hostgroup_name
+  tags:
+    - foreman
+    - foreman.inventory

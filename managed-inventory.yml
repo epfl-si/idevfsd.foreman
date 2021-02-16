@@ -1,0 +1,21 @@
+#####################
+# Managed inventory #
+#####################
+# In this file, we list the VMs that IDEV-FSD Foreman has the
+# authority to reinstall and/or monitor.
+#
+# Each toplevel key in this file is a Foreman host group.
+# Hosts that are part of that host group are in `hosts:`.
+
+idevfsdesis:
+  domain: xaas.epfl.ch
+  subnet: 10.95.80.0/24
+
+  hosts:
+    - name: itsidevfsd0009
+      macaddress: 00:50:56:84:39:3b
+      ip: 10.95.80.81
+
+    - name: itsidevfsd0010
+      macaddress: 00:50:56:84:d6:a8
+      ip: 10.95.80.84

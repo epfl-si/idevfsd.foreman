@@ -48,5 +48,8 @@ foreman_api_environment:
 foreman_main_organization_name: IDEV-FSD
 foreman_main_location_name: XaaS Prod
 
-foreman_slash24_subnets:
-  - 10.95.80
+foreman_default_install:
+  architecture: "x86_64"
+  operatingsystem: "Ubuntu 20.04"
+  medium: "Ubuntu mirror"
+  ptable: "Preseed default LVM"

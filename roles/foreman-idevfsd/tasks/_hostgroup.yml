@@ -1,0 +1,91 @@
+- name: "{{ hostgroup.domain }} domain"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.domain:
+    name: "{{ hostgroup.domain }}"
+    organizations: "{{ foreman_main_organization_name }}"
+    locations: "{{ foreman_main_location_name }}"
+
+- name: "/24 subnets"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.subnet:
+    name: "{{ subnet }}.0/24"
+    network: "{{ subnet }}.0"
+    mask: "255.255.255.0"
+    gateway: "{{ subnet }}.1"
+    boot_mode: "Static"
+  with_items: >-
+    {{ (hostgroup.hosts | valuesets)["ip"] | subnets_24 }}
+  loop_control:
+    loop_var: subnet
+
+- name: "{{ hostgroup_name }} host group"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.hostgroup:
+    name: "{{ hostgroup_name }}"
+    ## Only usable during install, reset afterwards:
+    root_pass: >-
+      {{ hostgroup.root_pass
+         | default(hostgroup_name) }}
+    organization: >-
+      {{ hostgroup.organization
+         | default(foreman_main_organization_name) }}
+    locations: >-
+      {{ hostgroup.location
+         | default(foreman_main_location_name) }}
+    domain: "{{ hostgroup.domain }}"
+    subnet: "{{ hostgroup.subnet }}"
+    architecture: >-
+      {{ hostgroup.architecture
+         | default(foreman_default_install.architecture) }}
+    operatingsystem: >-
+      {{ hostgroup.operatingsystem
+         | default(foreman_default_install.operatingsystem) }}
+    medium: >-
+      {{ hostgroup.medium
+         | default(foreman_default_install.medium) }}
+    ptable: >-
+      {{ hostgroup.ptable
+         | default(foreman_default_install.ptable) }}
+
+- name: "Discovery rules"
+  rails_script:
+    interpreter: "{{ foreman_docker_rails_interpreter }}"
+    action: |
+      changes = { :created => [], :hostname => [],
+                  :search => [], :hostgroup => [] }
+      {% for host in hostgroup.hosts %}
+      {% set rule_name = host.name + "@" + hostgroup_name %}
+      hostgroup = Hostgroup.find_by(name: "{{ hostgroup_name }}")
+
+      rule = DiscoveryRule.find_or_create_by(name: "{{ rule_name }}")
+      if rule.id.nil? then changes[:created].append "{{ host.name }}" end
+
+      {# Those are requirements of the ActiveRecord model,
+       # and therefore do not count as changes. #}
+      rule.organizations = hostgroup.organizations
+      rule.locations = hostgroup.locations
+      if rule.priority == 0
+        rule.priority = DiscoveryRule::suggest_priority
+      end
+
+      if rule.hostname != "{{ host.name }}"
+        rule.hostname = "{{ host.name }}"
+        changes[:hostname].append "{{ host.name }}"
+      end
+
+      search = "mac = {{ host.macaddress }}"
+      if rule.search != search
+        rule.search = search
+        changes[:search].append "{{ host.name }}"
+      end
+
+      if rule.hostgroup != hostgroup
+        rule.hostgroup = hostgroup
+        changes[:hostgroup].append "{{ host.name }}"
+      end
+
+      rule.save or raise "Could not save rule {{ rule_name }}"
+      {% endfor %}
+
+      exit_json(:changed => (not changes.values.flatten.empty?),
+                :changes => changes)
