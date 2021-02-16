@@ -44,3 +44,6 @@ foreman_api_environment:
   FOREMAN_USERNAME: "{{ foreman_admin_user }}"
   FOREMAN_PASSWORD: "{{ foreman_admin_password }}"
   FOREMAN_VALIDATE_CERTS: no
+
+foreman_main_organization_name: IDEV-FSD
+foreman_main_location_name: XaaS Prod

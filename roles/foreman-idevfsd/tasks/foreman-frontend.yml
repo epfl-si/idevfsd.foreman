@@ -76,8 +76,8 @@
     container_default_behavior: no_defaults
     env:
       ## RTFS @ https://github.com/theforeman/foreman/blob/develop/db/seeds.d/050-taxonomies.rb#L9
-      SEED_ORGANIZATION: IDEV-FSD
-      SEED_LOCATION: XaaS Prod
+      SEED_ORGANIZATION: "{{ foreman_main_organization_name }}"
+      SEED_LOCATION: "{{ foreman_main_location_name }}"
       ## Fun fact: there are no other taxonomy types (as of Foreman
       ## 2.3.2)
 
