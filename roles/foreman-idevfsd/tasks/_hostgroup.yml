@@ -12,6 +12,7 @@
     network: "{{ subnet }}.0"
     mask: "255.255.255.0"
     gateway: "{{ subnet }}.1"
+    domains: "{{ hostgroup.domain }}"
     boot_mode: "Static"
   with_items: >-
     {{ (hostgroup.hosts | valuesets)["ip"] | subnets_24 }}
