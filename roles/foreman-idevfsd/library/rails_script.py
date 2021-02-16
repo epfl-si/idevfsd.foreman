@@ -122,10 +122,37 @@ class RailsScriptTask(object):
         return re.sub(r"^(?=.)", indent_with, some_code, 0, re.MULTILINE)
 
     def _wrap_in_ruby_function(self, name, body):
+        subst = dict(
+            name=name,
+            unwrapped_name="unwrapped_%s" % name)
         return (
-            ("def %s\n" % name) +
+            ("def %(unwrapped_name)s\n" % subst) +
             self._indent(body, "  ") +
-            "\nend\n")
+            "\nend\n" + """
+
+unless defined? %(unwrapped_name)s
+  print "Error in function body for %(unwrapped_name)s\n"
+  exit
+end
+""" % subst + 
+# Note that we just `exit` above, because we need
+# the entire Ruby interpreter stdout in order to
+# troubleshoot compile-time errors. Not so with
+# runtime errors below; we want to call `exit_json`
+# on these, so as to reduce clutter.
+"""
+def %(name)s
+  begin
+    %(unwrapped_name)s
+  rescue Exception => e
+    exit_json(:failed => true, :in => "%(name)s",
+              :ruby_exn_class => e.class.to_s,
+              :ruby_exn => e.to_s,
+              :ruby_backtrace => e.backtrace.join("\n"))
+  end
+end
+
+""" % subst)
 
     def _make_script(self):
         script = """
