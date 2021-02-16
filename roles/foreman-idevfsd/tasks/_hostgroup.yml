@@ -22,10 +22,6 @@
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.hostgroup:
     name: "{{ hostgroup_name }}"
-    ## Only usable during install, reset afterwards:
-    root_pass: >-
-      {{ hostgroup.root_pass
-         | default(hostgroup_name) }}
     organization: >-
       {{ hostgroup.organization
          | default(foreman_main_organization_name) }}
@@ -46,6 +42,18 @@
     ptable: >-
       {{ hostgroup.ptable
          | default(foreman_default_install.ptable) }}
+
+## Only usable during install, reset afterwards:
+- name: "{{ hostgroup_name }} root password (only during install)"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.hostgroup:
+    name: "{{ hostgroup_name }}"
+    root_pass: >-
+      {{ hostgroup.root_pass
+         | default(hostgroup_name) }}
+  ## "Will result in the entity always being updated, as the current
+  ## password cannot be retrieved". Sigh
+  changed_when: false
 
 - name: "Discovery rules"
   rails_script:
