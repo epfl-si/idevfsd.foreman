@@ -13,7 +13,9 @@
     dest: "{{ foreman_frontend_build_dir }}/Dockerfile"
     content: >-
       {{ lookup("template", "Dockerfile") }}
-  tags: foreman.frontend.image
+  tags:
+    - foreman.frontend.image
+    - foreman.frontend.dockerfile
 
 - name: "{{ foreman_frontend_image }}"
   docker_image:

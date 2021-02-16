@@ -20,6 +20,7 @@
     - foreman
     - foreman.frontend
     - foreman.frontend.image
+    - foreman.frontend.dockerfile
 
 - name: "Foreman configuration"
   include_tasks:
