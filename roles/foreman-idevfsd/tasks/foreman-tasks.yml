@@ -33,3 +33,6 @@
     - foreman
     - foreman.config
     - foreman.config.os
+    - foreman.config.hostgroup
+    - foreman.config.domain
+    - foreman.config.subnets

@@ -18,12 +18,49 @@
     major: "20"
     minor: "04"
     password_hash: SHA256
+    ## “x86_64” architecture, “Ubuntu mirror” media and “Preseed
+    ## default LVM” partition table template are all pre-seededin
+    ## Foreman
+    architectures:
+      - x86_64
+    media:
+      - "Ubuntu mirror"
+    ptables:
+      - "Preseed default LVM"
   tags:
     - foreman.config.os
+
+- name: "xaas.epfl.ch domain"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.domain:
+    name: xaas.epfl.ch
+    organizations: "{{ foreman_main_organization_name }}"
+    locations: "{{ foreman_main_location_name }}"
+  tags:
+    - foreman.config.domain
+
+- name: "/24 subnets"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.subnet:
+    name: "{{ item }}.0/24"
+    network: "{{ item }}.0"
+    mask: "255.255.255.0"
+    gateway: "{{ item }}.1"
+    boot_mode: "Static"
+  with_items: "{{ foreman_slash24_subnets }}"
+  tags:
+    - foreman.config.subnets
 
 - name: "idevfsdesis host group"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.hostgroup:
     name: idevfsdesis
+    root_pass: idevfsdesis   ## Only usable during install, reset afterwards
+    organization: "{{ foreman_main_organization_name }}"
+    locations: "{{ foreman_main_location_name }}"
+    domain: xaas.epfl.ch
+    operatingsystem: "Ubuntu 20.04"
+    medium: "Ubuntu mirror"
+    ptable: "Preseed default LVM"
   tags:
     - foreman.config.hostgroup
