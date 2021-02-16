@@ -20,3 +20,10 @@
     password_hash: SHA256
   tags:
     - foreman.config.os
+
+- name: "idevfsdesis host group"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.hostgroup:
+    name: idevfsdesis
+  tags:
+    - foreman.config.hostgroup
