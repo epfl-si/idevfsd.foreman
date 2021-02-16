@@ -15,11 +15,19 @@ RUN echo "gem 'foreman_bootdisk'" > bundler.d/foreman_bootdisk.rb
 RUN echo "gem 'foreman_discovery'" > bundler.d/foreman_discovery.rb
 
 RUN bundle install
+
+## JavaScript churn
 RUN npm install --no-optional
 # Stray dependency of foreman-tasks:
 RUN npm i --save humanize-duration
 RUN ./node_modules/webpack/bin/webpack.js --config config/webpack.config.js
 RUN npm run analyze
+# Unbloat vendor/ in prevision of the COPY in the next stage.
+# We don't run node in production (we only use node for webpacking
+# things), so we can get rid of these for a ~2.4 GB gain:
+RUN find vendor -name node_modules -prune | xargs rm -rf
+
+## Finishing
 RUN bundle install --without "${BUNDLER_SKIPPED_GROUPS}" assets
 
 ##################################################################################
