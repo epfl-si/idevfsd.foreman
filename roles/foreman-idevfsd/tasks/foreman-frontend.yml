@@ -102,9 +102,14 @@
     mounts: "{{ foreman_frontend_mounts }}"
     labels:
       traefik.enable: "true"
+      traefik.docker.network: "{{ foreman_docker_network_name }}"
       traefik.http.routers.foreman.rule: >-
         PathPrefix(`/`)
     env:
       FOREMAN_ENV: production
       FOREMAN_BIND: tcp://0.0.0.0:3000
     container_default_behavior: no_defaults
+    networks_cli_compatible: no
+    purge_networks: yes  ## No default network
+    networks:
+      - name: "{{ foreman_docker_network_name }}"

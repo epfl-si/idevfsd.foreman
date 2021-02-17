@@ -4,6 +4,7 @@
 
 traefik_docker_image: "traefik:v2.4"
 traefik_container_name: traefik
+traefik_networks: []
 traefik_static_config_file_path: "{{ traefik_root_location }}/conf/traefik.yml"
 traefik_dynamic_config_dir: "{{ traefik_root_location }}/conf/dynamic"
 traefik_container_restart_policy: "always"

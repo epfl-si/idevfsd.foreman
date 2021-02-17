@@ -58,6 +58,9 @@
          else mounts_always }}
     ports: "{{ _traefik_external_ports }}"
     container_default_behavior: no_defaults
+    networks_cli_compatible: no
+    networks: "{{ traefik_networks }}"  ## In addition to the default one (bridge),
+                                        ## since we are not setting purge_networks
   vars:
     mounts_always:
     - type: bind

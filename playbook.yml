@@ -3,6 +3,16 @@
   roles:
     - role: roles/docker-pip3
 
+- name: "Dedicated Docker network for Foreman"
+  gather_facts: no
+  hosts:
+    - itsidevfsd0005
+  tasks:
+    - docker_network:
+        name: "{{ foreman_docker_network_name }}"
+  vars_files:
+    - vars/global-vars.yml
+
 - name: Træfik
   hosts:
     - itsidevfsd0005
@@ -16,6 +26,8 @@
     # traefik_external_https_port is defined in vars/global-vars.yml
     traefik_certificate_selfsigned_subject: >-
       /CN={{ ansible_facts["fqdn"] }}
+    traefik_networks:
+      - name: "{{ foreman_docker_network_name }}"
 
 - name: Foreman server
   hosts:
