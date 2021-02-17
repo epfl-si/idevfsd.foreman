@@ -24,7 +24,7 @@ foreman_frontend_mounts:
     target: /home/foreman/config/settings.yaml
 
 foreman_smartproxy_build_dir: "{{ foreman_topdir }}/build/smartproxy"
-foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:latest"
+foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:{{ foreman_version }}"
 foreman_smartproxy_container_name: "smartproxy_{{ inventory_environment }}"
 
 foreman_docker_rails_interpreter:
