@@ -13,22 +13,31 @@ USER 1001
 RUN echo "gem 'foreman_ansible'" > bundler.d/foreman_ansible.rb
 RUN echo "gem 'foreman_bootdisk'" > bundler.d/foreman_bootdisk.rb
 RUN echo "gem 'foreman_discovery'" > bundler.d/foreman_discovery.rb
+RUN echo "gem 'activerecord-nulldb-adapter'" > bundler.d/nulldb.rb
 
 RUN bundle install
 
 ## JavaScript churn
-RUN npm install --no-optional
+RUN set -e -x; \
+   npm install --no-optional; \
 # Stray dependency of foreman-tasks:
-RUN npm i --save humanize-duration
-RUN ./node_modules/webpack/bin/webpack.js --config config/webpack.config.js
-RUN npm run analyze
-# Unbloat vendor/ in prevision of the COPY in the next stage.
-# We don't run node in production (we only use node for webpacking
-# things), so we can get rid of these for a ~2.4 GB gain:
-RUN find vendor -name node_modules -prune | xargs rm -rf
+   npm i --save humanize-duration; \
+   ./node_modules/webpack/bin/webpack.js --config config/webpack.config.js; \
+   npm run analyze; \
+# Unbloat the layer. We don't run node in production (we only use node
+# for webpacking things), so we can get rid of these for a ~3.5 GB
+# gain:
+   rm -rf node_modules .npm; \
+   find vendor -name node_modules -prune | xargs rm -rf
 
 ## Finishing
 RUN bundle install --without "${BUNDLER_SKIPPED_GROUPS}" assets
+RUN yes | bundle exec rails app:update:bin
+RUN set -e -x; \
+  echo "ActiveRecord::Schema.define(version: 1) do end" > db/schema.rb; \
+  DATABASE_URL=nulldb://nohost bundle exec rake apipie:cache:index; \
+  rm db/schema.rb
+RUN rm bundler.d/nulldb.rb
 
 ##################################################################################
 FROM {{ foreman_frontend_base_image }}
