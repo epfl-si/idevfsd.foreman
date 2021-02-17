@@ -7,7 +7,7 @@
       cat >&2 <<MESSAGE
       Please ensure that {{ discovery_source_image }} is available, e.g. with
 
-      mount -t cifs -o username=YOURGASPARLOGIN //nassvmmix01.epfl.ch/si_vsissp_iso_priv_repo_p01_app/ITServices/its_idevfsd {{ discovery_source_image | dirname }}
+      mount -t cifs -o username=YOURGASPARLOGIN //nassvmmix01.epfl.ch/si_vsissp_iso_priv_repo_p01_app/ITServices/its_idevfsd {{ discovery_remastered_image | dirname }}
 
       MESSAGE
 

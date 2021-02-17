@@ -1,2 +1,2 @@
-discovery_source_image: /srv/vmware-isos/foreman-discovery-bootable-3.7.3.iso
+discovery_source_image: /srv/vmware-isos/downloads/foreman-discovery-bootable-3.7.3.iso
 discovery_remastered_image: /srv/vmware-isos/foreman-discovery-idevfsd-3.7.3.iso
