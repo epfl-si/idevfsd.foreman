@@ -113,3 +113,14 @@
     purge_networks: yes  ## No default network
     networks:
       - name: "{{ foreman_docker_network_name }}"
+  register: _foreman_frontend_container
+
+- name: "Wait for front-end to be operational"
+  uri:
+    force: yes
+    url: "{{ foreman_frontend_url }}"
+    validate_certs: no
+  register: result
+  until: result is success
+  retries: 10
+  delay: 3
