@@ -8,7 +8,7 @@ foreman_postgres_initdb_sql_script: "{{ foreman_topdir }}/data/initdb.sql"
 
 foreman_version: 2.3.2
 foreman_frontend_base_image: "quay.io/foreman/foreman:{{ foreman_version }}"
-foreman_frontend_build_dir: "{{ foreman_topdir }}/build"
+foreman_frontend_build_dir: "{{ foreman_topdir }}/build/frontend"
 foreman_frontend_image: "epflidevfsd/foreman:{{ foreman_version }}"
 foreman_frontend_container_name: "foreman_{{ inventory_environment }}"
 foreman_frontend_config_dir: "{{ foreman_topdir }}/config"
@@ -22,6 +22,10 @@ foreman_frontend_mounts:
   - type: bind
     source: "{{ foreman_frontend_config_dir }}/settings.yaml"
     target: /home/foreman/config/settings.yaml
+
+foreman_smartproxy_build_dir: "{{ foreman_topdir }}/build/smartproxy"
+foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:latest"
+foreman_smartproxy_container_name: "smartproxy_{{ inventory_environment }}"
 
 foreman_docker_rails_interpreter:
   - docker

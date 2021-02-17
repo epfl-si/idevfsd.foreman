@@ -1,0 +1,52 @@
+- name: "Directories"
+  file:
+    state: directory
+    recurse: yes
+    path: "{{ item }}"
+  with_items:
+    - "{{ foreman_smartproxy_build_dir }}"
+  tags: foreman.smartproxy.image
+
+- name: "{{ foreman_smartproxy_build_dir }}/Dockerfile"
+  copy:
+    dest: "{{ foreman_smartproxy_build_dir }}/Dockerfile"
+    content: >-
+      {{ lookup("template", "Dockerfile.smartproxy") }}
+  tags:
+    - foreman.smartproxy.image
+
+- name: "{{ foreman_smartproxy_build_dir }}/settings.yml"
+  copy:
+    dest: "{{ foreman_smartproxy_build_dir }}/settings.yml"
+    content: >-
+      {{ lookup("template", "smartproxy-settings.yml") }}
+  tags:
+    - foreman.smartproxy.image
+
+- name: "{{ foreman_smartproxy_image }}"
+  docker_image:
+    name: "{{ foreman_smartproxy_image }}"
+    source: build
+    force_source: yes
+    build:
+      pull: no     # Don't re-pull
+      path: '{{ foreman_smartproxy_build_dir }}'
+  tags: foreman.smartproxy.image
+
+- name: "Foreman smart proxy running in Docker"
+  docker_container:
+    name: "{{ foreman_smartproxy_container_name }}"
+    image: "{{ foreman_smartproxy_image }}"
+    detach: yes
+    restart_policy: unless-stopped
+    state: started
+    log_driver: json-file
+    log_options:
+      max-size: 50m
+      max-file: "3"
+    container_default_behavior: no_defaults
+    networks_cli_compatible: no
+    purge_networks: yes  ## No default network
+    networks:
+      - name: "{{ foreman_docker_network_name }}"
+    command: /usr/src/app/bin/smart-proxy

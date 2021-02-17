@@ -9,6 +9,18 @@
     - foreman
     - foreman.postgres
 
+- name: "Foreman smart proxy"
+  include_tasks:
+    file: foreman-smartproxy.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.smartproxy
+  tags:
+    - foreman
+    - foreman.smartproxy
+    - foreman.smartproxy.image
+
 - name: "Foreman front-end server"
   include_tasks:
     file: foreman-frontend.yml

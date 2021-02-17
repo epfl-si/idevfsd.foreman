@@ -1,0 +1,6 @@
+
+:foreman_url: "http://foreman_prod:3000/"
+
+:bind_host: '0.0.0.0'
+:http_port: 8000
+:log_file: STDOUT

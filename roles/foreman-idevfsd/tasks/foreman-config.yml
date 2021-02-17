@@ -9,6 +9,17 @@
       admin.save
     recheck: yes
 
+- name: "Connect to smart proxy"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.smart_proxy:
+    name: "smart proxy in Docker"
+    url: "http://{{ foreman_smartproxy_container_name }}:8000/"
+    organizations:
+      - "{{ foreman_main_organization_name }}"
+    locations:
+      - "{{ foreman_main_location_name }}"
+    state: present
+
 - name: "Ubuntu 20.04"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.operatingsystem:
