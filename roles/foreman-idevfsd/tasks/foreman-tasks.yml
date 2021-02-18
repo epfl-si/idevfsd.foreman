@@ -68,3 +68,14 @@
   tags:
     - foreman
     - foreman.inventory
+
+- name: "Foreman custom template snippets"
+  include_tasks:
+    file: foreman-snippets.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.snippets
+  tags:
+    - foreman
+    - foreman.snippets

@@ -1,0 +1,34 @@
+- include_vars:
+    name: foreman_inventory
+    file: "../../../managed-inventory.yml"
+
+- name: Install the YAML Python API
+  pip:
+    executable: pip3
+    name:
+      - PyYAML
+    state: latest
+
+- name: "Preseed default finish custom snippet"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.provisioning_template:
+    # As the name implies, `Preseed default finish` calls out to this one
+    name: "Preseed default finish custom snippet"
+    kind: snippet
+    template: |
+      <%= snippet_if_exists(@host.hostgroup.to_s + " finish snippet") %>
+
+- name: "Per-hostgroup finish snippets"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.provisioning_template:
+    name: "{{ hostgroup_name }} finish snippet"
+    kind: snippet
+    template: |
+      {{ hostgroup["finish_snippet"] }}
+  vars:
+    hostgroup: "{{ foreman_inventory[hostgroup_name] }}"
+  when: >-
+    "finish_snippet" in hostgroup
+  with_items: "{{ foreman_inventory.keys() }}"
+  loop_control:
+    loop_var: hostgroup_name

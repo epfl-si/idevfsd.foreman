@@ -11,6 +11,9 @@ idevfsdesis:
   domain: xaas.epfl.ch
   subnet: 10.95.80.0/24
 
+  finish_snippet: |
+    echo "idevfsdesis was there."
+
   hosts:
     - name: itsidevfsd0009
       macaddress: 00:50:56:84:39:3b
