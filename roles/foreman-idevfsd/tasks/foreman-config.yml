@@ -47,6 +47,7 @@
       ## See explanations below
       - "Discovery Debian kexec"
       - "Preseed default"
+      - "Preseed default finish"
       - "Preseed default user data"
   tags:
     - foreman.config.os
@@ -66,6 +67,9 @@
       template_kind: "provision"
       ## TODO: this template insists on setting up a root password.
       provisioning_template: "Preseed default"
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "finish"
+      provisioning_template: "Preseed default finish"
       ## This ensures that Foreman obtains ssh access to the installed node
     - operatingsystem: "Ubuntu 20.04"
       template_kind: "user_data"
