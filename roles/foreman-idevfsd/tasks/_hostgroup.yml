@@ -46,8 +46,7 @@
       {{ hostgroup.ptable
          | default(foreman_default_install.ptable) }}
 
-## Only usable during install, reset afterwards:
-- name: "{{ hostgroup_name }} root password (only during install)"
+- name: "{{ hostgroup_name }} root password (not useable over the network)"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.hostgroup:
     name: "{{ hostgroup_name }}"
