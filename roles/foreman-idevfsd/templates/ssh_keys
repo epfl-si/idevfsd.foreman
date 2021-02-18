@@ -1,0 +1,10 @@
+{% for key_struct in ssh_keys -%}
+{%-  if key_struct.from == "github" -%}
+{%-   set url = "https://github.com/" + key_struct.login + ".keys" -%}
+{%-    for key in lookup("url", url, wantlist=True) %}
+{{ key }} {{ url }}
+{%     endfor -%}
+{%  else -%}
+{{ _this__is_going_to_fail | mandatory("Don't know how to fetch ssh key: " + (key_struct | to_json)) }}
+{%-  endif -%}
+{%- endfor %}

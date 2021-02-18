@@ -45,6 +45,14 @@
     ptable: >-
       {{ hostgroup.ptable
          | default(foreman_default_install.ptable) }}
+    parameters:
+      - name: remote_execution_ssh_keys
+        parameter_type: string
+        value: >-
+          {{ lookup("template", "ssh_keys") }}
+  vars:
+    ssh_keys: >-
+      {{ hostgroup.root_ssh_keys }}
 
 - name: "{{ hostgroup_name }} root password (not useable over the network)"
   environment: "{{ foreman_api_environment }}"
