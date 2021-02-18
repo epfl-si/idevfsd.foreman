@@ -70,3 +70,15 @@
     - operatingsystem: "Ubuntu 20.04"
       template_kind: "user_data"
       provisioning_template: "Preseed default user data"
+
+- name: "Ubuntu 20.04 mirror"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.installation_medium:
+    name: "Ubuntu mirror"
+    path: "http://mirror.switch.ch/ftp/mirror/ubuntu"
+    ## TODO: replace with this when Carlos' sync is complete
+    # path: "http://install.iccluster.epfl.ch/mirrors/ubuntu/ubuntu"
+    organizations:
+      - "{{ foreman_main_organization_name }}"
+    locations:
+      - "{{ foreman_main_location_name }}"
