@@ -1,17 +1,16 @@
 foreman_topdir: /srv/foreman
 
 foreman_postgres_image: postgres:12
-foreman_postgres_socket_dir: "{{ foreman_topdir }}/run/postgres"
-foreman_postgres_storage_dir: "{{ foreman_topdir }}/data/postgres"
-foreman_postgres_root_password_file: "{{ foreman_topdir }}/postgres-root-password"
-foreman_postgres_initdb_sql_script: "{{ foreman_topdir }}/data/initdb.sql"
+foreman_postgres_socket_dir: "{{ foreman_topdir }}/postgres/run"
+foreman_postgres_storage_dir: "{{ foreman_topdir }}/postgres/data"
+foreman_postgres_initdb_sql_script: "{{ foreman_topdir }}/postgres/initdb.sql"
 
 foreman_version: 2.3.2
 foreman_frontend_base_image: "quay.io/foreman/foreman:{{ foreman_version }}"
 foreman_frontend_build_dir: "{{ foreman_topdir }}/frontend/build"
 foreman_frontend_image: "epflidevfsd/foreman:{{ foreman_version }}"
 foreman_frontend_container_name: "foreman_{{ inventory_environment }}"
-foreman_frontend_config_dir: "{{ foreman_topdir }}/config"
+foreman_frontend_config_dir: "{{ foreman_topdir }}/frontend/config"
 foreman_frontend_mounts:
   - type: bind
     source: "{{ foreman_postgres_socket_dir }}"
