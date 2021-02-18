@@ -29,14 +29,37 @@
     major: "20"
     minor: "04"
     password_hash: SHA256
-    ## “x86_64” architecture, “Ubuntu mirror” media and “Preseed
-    ## default LVM” partition table template are all pre-seededin
-    ## Foreman
+    ## Literal values below are all pre-seeded during Foreman install
     architectures:
       - x86_64
     media:
       - "Ubuntu mirror"
     ptables:
       - "Preseed default LVM"
+    provisioning_templates:
+      ## See explanations below
+      - "Discovery Debian kexec"
+      - "Preseed default"
+      - "Preseed default user data"
   tags:
     - foreman.config.os
+
+- name: "Ubuntu 20.04 default templates"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.os_default_template: "{{ item }}"
+  with_items:
+    - operatingsystem: "Ubuntu 20.04"
+      ## This says how the PXE-less discovery process
+      ## (https://theforeman.org/plugins/foreman_discovery/15.0/index.html#5.3PXE-lessdiscovery)
+      ## boots into install mode:
+      template_kind: "kexec"
+      provisioning_template: "Discovery Debian kexec"
+      ## This governs the main install process
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "provision"
+      ## TODO: this template insists on setting up a root password.
+      provisioning_template: "Preseed default"
+      ## This ensures that Foreman obtains ssh access to the installed node
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "user_data"
+      provisioning_template: "Preseed default user data"
