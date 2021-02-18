@@ -46,5 +46,7 @@ entryPoints:
 
   websecure:
     address: ":443"
+{% if not traefik_http_on_https_port %}
     http:
       tls: {}
+{% endif %}

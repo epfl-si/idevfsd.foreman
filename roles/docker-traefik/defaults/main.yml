@@ -8,6 +8,14 @@ traefik_networks: []
 traefik_static_config_file_path: "{{ traefik_root_location }}/conf/traefik.yml"
 traefik_dynamic_config_dir: "{{ traefik_root_location }}/conf/dynamic"
 traefik_container_restart_policy: "always"
+## If true, the websecure entryPoint will *not* be fitted with a
+## default http → tls section. This means that all containers
+## (actually, all routers) are free to request TLS support
+## using e.g. a `traefik.http.routers.foo.tls: "true"` label,
+## or opt not to. This gives one the ability to mix HTTP and
+## HTTP/S traffic on the same port (at the cost of additional
+## scrutinity required to enforce security).
+traefik_http_on_https_port: false
 
 ## Feature flags
 traefik_use_docker_labels: true

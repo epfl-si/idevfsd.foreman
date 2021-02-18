@@ -103,8 +103,13 @@
     labels:
       traefik.enable: "true"
       traefik.docker.network: "{{ foreman_docker_network_name }}"
+      traefik.http.routers.foreman.tls: "true"
       traefik.http.routers.foreman.rule: >-
         PathPrefix(`/`)
+      traefik.http.routers.foremanhttp.rule: >-
+        PathPrefix(`/unattended/`)
+      traefik.http.routers.foremanhttp.tls: "false"
+      traefik.http.routers.foremanhttp.entrypoints: "websecure"
     env:
       FOREMAN_ENV: production
       FOREMAN_BIND: tcp://0.0.0.0:3000

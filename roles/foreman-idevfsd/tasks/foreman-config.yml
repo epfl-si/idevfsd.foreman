@@ -20,6 +20,13 @@
       - "{{ foreman_main_location_name }}"
     state: present
 
+- name: "unattended_url"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.setting:
+    name: "unattended_url"
+    value: >-
+      {{ foreman_frontend_url | replace("https://", "http://") }}
+
 - name: "Ubuntu 20.04"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.operatingsystem:
