@@ -18,5 +18,7 @@
     creates: "{{ discovery_remastered_image }}"
     cmd: |
       discovery-remaster "{{ discovery_source_image }}" \
-         'proxy.url={{ foreman_frontend_url }} proxy.type=foreman' \
+         '{% for k in discovery_remaster_tags.keys() -%}
+          {#- -#}{{ k }}={{ discovery_remaster_tags[k] }} {# -#}
+          {%- endfor %}' \
          "{{ discovery_remastered_image }}"

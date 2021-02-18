@@ -1,2 +1,10 @@
 discovery_source_image: /srv/vmware-isos/downloads/foreman-discovery-bootable-3.7.3.iso
-discovery_remastered_image: /srv/vmware-isos/foreman-discovery-idevfsd-3.7.3.iso
+discovery_remastered_version: 2
+discovery_remastered_image: "/srv/vmware-isos/foreman-discovery-idevfsd-3.7.3-{{ discovery_remastered_version }}.iso"
+
+discovery_remaster_tags:
+  ## https://theforeman.org/plugins/foreman_discovery/15.0/index.html#3.1.5Discoveryimagekerneloptions
+  proxy.url: "{{ foreman_frontend_url }}"
+  proxy.type: foreman
+  ## https://theforeman.org/plugins/foreman_discovery/15.0/index.html#5.3.1Unattendedandsemi-automaticmode
+  fdi.pxdns: 128.178.15.227
