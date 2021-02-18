@@ -1,10 +1,8 @@
-- name: "Directories"
+- name: "Build directory"
   file:
     state: directory
     recurse: yes
-    path: "{{ item }}"
-  with_items:
-    - "{{ foreman_smartproxy_build_dir }}"
+    path: "{{ foreman_smartproxy_build_dir }}"
   tags: foreman.smartproxy.image
 
 - name: "{{ foreman_smartproxy_build_dir }}/Dockerfile"
@@ -33,6 +31,17 @@
       path: '{{ foreman_smartproxy_build_dir }}'
   tags: foreman.smartproxy.image
 
+- name: "Secrets directory"
+  file:
+    state: directory
+    recurse: yes
+    path: "{{ foreman_smartproxy_secrets_dir }}"
+    mode: "0700"
+
+- name: "ssh key pair for the smart proxy"
+  community.crypto.openssh_keypair:
+    path: "{{ foreman_smartproxy_secrets_dir }}/id_rsa_foreman_proxy"
+
 - name: "Foreman smart proxy running in Docker"
   docker_container:
     name: "{{ foreman_smartproxy_container_name }}"
@@ -50,3 +59,7 @@
     networks:
       - name: "{{ foreman_docker_network_name }}"
     command: /usr/src/app/bin/smart-proxy
+    mounts:
+      - type: bind
+        source: "{{ foreman_smartproxy_secrets_dir }}"
+        target: /root/.ssh
