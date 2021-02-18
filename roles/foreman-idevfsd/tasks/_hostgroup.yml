@@ -46,7 +46,11 @@
       {{ hostgroup.ptable
          | default(foreman_default_install.ptable) }}
     parameters:
-      - name: remote_execution_ssh_keys
+      - name: host_registration_remote_execution
+        parameter_type: boolean
+        value: >-
+          {{ hostgroup.root_ssh_keys | selectattr("from", "eq", "foreman") | length > 0 }}
+      - name: epfl_root_authorized_keys
         parameter_type: string
         value: >-
           {{ lookup("template", "ssh_keys") }}

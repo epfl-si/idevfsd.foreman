@@ -40,7 +40,7 @@
 
 - name: "ssh key pair for the smart proxy"
   community.crypto.openssh_keypair:
-    path: "{{ foreman_smartproxy_secrets_dir }}/id_rsa_foreman_proxy"
+    path: "{{ foreman_smartproxy_ssh_private_key_path }}"
 
 - name: "Foreman smart proxy running in Docker"
   docker_container:

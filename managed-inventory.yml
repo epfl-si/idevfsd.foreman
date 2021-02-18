@@ -15,6 +15,7 @@ idevfsdesis:
     echo "idevfsdesis was there."
 
   root_ssh_keys:
+    - from: foreman
     - from: github
       login: domq
     - from: github

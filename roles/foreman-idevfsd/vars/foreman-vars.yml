@@ -26,6 +26,10 @@ foreman_smartproxy_build_dir: "{{ foreman_topdir }}/smartproxy/build"
 foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:{{ foreman_version }}"
 foreman_smartproxy_container_name: "smartproxy_{{ inventory_environment }}"
 foreman_smartproxy_secrets_dir: "{{ foreman_topdir }}/smartproxy/secrets"
+# The basenames are dictated by the default values of the
+# smart_proxy_remote_execution_ssh plugin:
+foreman_smartproxy_ssh_private_key_path: "{{ foreman_smartproxy_secrets_dir }}/id_rsa_foreman_proxy"
+foreman_smartproxy_ssh_public_key_path: "{{ foreman_smartproxy_ssh_private_key_path }}.pub"
 
 foreman_docker_rails_interpreter:
   - docker
