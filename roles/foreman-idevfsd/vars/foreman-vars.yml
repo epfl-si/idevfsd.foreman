@@ -25,6 +25,7 @@ foreman_frontend_mounts:
 foreman_smartproxy_build_dir: "{{ foreman_topdir }}/smartproxy/build"
 foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:{{ foreman_version }}"
 foreman_smartproxy_container_name: "smartproxy_{{ inventory_environment }}"
+foreman_smartproxy_config_dir: "{{ foreman_topdir }}/smartproxy/config"
 foreman_smartproxy_secrets_dir: "{{ foreman_topdir }}/smartproxy/secrets"
 # The basenames are dictated by the default values of the
 # smart_proxy_remote_execution_ssh plugin:

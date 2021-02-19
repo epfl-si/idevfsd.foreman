@@ -1,8 +1,11 @@
-- name: "Build directory"
+- name: "Directories"
   file:
     state: directory
     recurse: yes
-    path: "{{ foreman_smartproxy_build_dir }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ foreman_smartproxy_config_dir }}/settings.d"
+    - "{{ foreman_smartproxy_build_dir }}"
   tags: foreman.smartproxy.image
 
 - name: "{{ foreman_smartproxy_build_dir }}/Dockerfile"
@@ -10,14 +13,6 @@
     dest: "{{ foreman_smartproxy_build_dir }}/Dockerfile"
     content: >-
       {{ lookup("template", "Dockerfile.smartproxy") }}
-  tags:
-    - foreman.smartproxy.image
-
-- name: "{{ foreman_smartproxy_build_dir }}/settings.yml"
-  copy:
-    dest: "{{ foreman_smartproxy_build_dir }}/settings.yml"
-    content: >-
-      {{ lookup("template", "smartproxy-settings.yml") }}
   tags:
     - foreman.smartproxy.image
 
@@ -42,6 +37,13 @@
   community.crypto.openssh_keypair:
     path: "{{ foreman_smartproxy_ssh_private_key_path }}"
 
+- name: "{{ foreman_smartproxy_config_dir }}/settings.yml"
+  copy:
+    dest: "{{ foreman_smartproxy_config_dir }}/settings.yml"
+    content: >-
+      {{ lookup("template", "smartproxy-settings.yml") }}
+  register: _foreman_smartproxy_configuration_file
+
 - name: "Foreman smart proxy running in Docker"
   docker_container:
     name: "{{ foreman_smartproxy_container_name }}"
@@ -49,6 +51,11 @@
     detach: yes
     restart_policy: unless-stopped
     state: started
+    restart: >-
+      {{ (_foreman_smartproxy_configuration_file is defined)
+         and
+         (_foreman_smartproxy_configuration_file is changed)
+      }}
     log_driver: json-file
     log_options:
       max-size: 50m
@@ -58,8 +65,10 @@
     purge_networks: yes  ## No default network
     networks:
       - name: "{{ foreman_docker_network_name }}"
-    command: /usr/src/app/bin/smart-proxy
     mounts:
       - type: bind
         source: "{{ foreman_smartproxy_secrets_dir }}"
         target: /root/.ssh
+      - type: bind
+        source: "{{ foreman_smartproxy_config_dir }}/settings.yml"
+        target: /usr/src/app/config/settings.yml

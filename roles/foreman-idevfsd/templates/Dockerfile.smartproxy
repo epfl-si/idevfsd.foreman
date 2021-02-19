@@ -30,16 +30,19 @@ RUN set -e -x; \
    git pull --tags; \
    git checkout ${FOREMAN_SMARTPROXY_VERSION}
 
+RUN cd .. && git clone https://github.com/theforeman/smart_proxy_dynflow.git
+
 # https://github.com/theforeman/smart_proxy_dynflow
 RUN set -e -x; exec > bundler.d/ssh.rb; \
-  echo "gem 'smart_proxy_dynflow', :git => 'https://github.com/theforeman/smart_proxy_dynflow.git'"; \
+  echo "gem 'smart_proxy_dynflow', :path => '../smart_proxy_dynflow'"; \
+  echo "gem 'smart_proxy_dynflow_core', :path => '../smart_proxy_dynflow'"; \
   echo "gem 'smart_proxy_remote_execution_ssh', :git => 'https://github.com/theforeman/smart_proxy_remote_execution_ssh.git'"
+
 RUN echo "gem 'smart_proxy_ansible', :git => 'https://github.com/theforeman/smart_proxy_ansible.git'" > bundler.d/ansible.rb
 
-RUN (echo "---"; echo ":enabled: true") > config/settings.d/dynflow.yml
+RUN (echo "---"; echo ":enabled: true"; echo ":database:") > config/settings.d/dynflow.yml
 RUN (echo "---"; echo ":enabled: true") > config/settings.d/remote_execution_ssh.yml
 RUN (echo "---"; echo ":enabled: true") > config/settings.d/ansible.yml
 
 RUN bundle --without bmc:krb5:libvirt:puppet_proxy_legacy:test:windows
-
-ADD settings.yml config/settings.yml
+CMD bundle exec /usr/src/app/bin/smart-proxy
