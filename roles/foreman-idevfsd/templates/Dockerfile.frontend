@@ -43,10 +43,26 @@ RUN rm bundler.d/nulldb.rb
 FROM {{ foreman_frontend_base_image }}
 MAINTAINER IDEV-FSD <idev-fsd@groupes.epfl.ch>
 
-# Just for comfort (M-x grep-find):
 USER 0
-RUN microdnf install findutils && microdnf clean all
+
+# findutils is just for comfort (M-x grep-find)
+# busybox gives us runsvdir & co
+RUN microdnf install findutils busybox && microdnf clean all
+RUN ln -s busybox /usr/sbin/runsv
+RUN mkdir /etc/service; chown 1001 /etc/service
+
 USER 1001
+
+RUN mkdir -p /etc/service/{foreman-frontend,dynflow}
+RUN set -e -x; exec > /etc/service/foreman-frontend/run; \
+  echo "#!/bin/sh"; echo "set -e -x"; \
+  echo "cd /home/foreman"; echo "exec bundle exec bin/rails server"
+
+RUN set -e -x; exec > /etc/service/dynflow/run; \
+  echo "#!/bin/sh"; echo "set -e -x"; \
+  echo "cd /home/foreman"; echo "exec bundle exec rake dynflow:executor"
+
+RUN chmod 755 /etc/service/*/run
 
 RUN rm -rf bin vendor bundler.d app public db && mkdir bin vendor bundler.d app public db
 COPY --from=kitchensink /home/foreman/bin/ /home/foreman/bin/
@@ -55,3 +71,5 @@ COPY --from=kitchensink /home/foreman/bundler.d/ /home/foreman/bundler.d/
 COPY --from=kitchensink /home/foreman/app/ /home/foreman/app/
 COPY --from=kitchensink /home/foreman/public/ /home/foreman/public/
 COPY --from=kitchensink /home/foreman/db/ /home/foreman/db/
+
+CMD busybox runsvdir -P /etc/service
