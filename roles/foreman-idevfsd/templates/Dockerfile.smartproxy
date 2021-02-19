@@ -9,6 +9,7 @@ RUN dnf -y install \
     sqlite-devel \
     rubygem-{nokogiri,bundler,unf_ext,rdoc} \
     redhat-rpm-config \
+    ansible \
     systemd-devel \
     nodejs \
     openssh-clients \
@@ -33,9 +34,11 @@ RUN set -e -x; \
 RUN set -e -x; exec > bundler.d/ssh.rb; \
   echo "gem 'smart_proxy_dynflow', :git => 'https://github.com/theforeman/smart_proxy_dynflow.git'"; \
   echo "gem 'smart_proxy_remote_execution_ssh', :git => 'https://github.com/theforeman/smart_proxy_remote_execution_ssh.git'"
+RUN echo "gem 'smart_proxy_ansible', :git => 'https://github.com/theforeman/smart_proxy_ansible.git'" > bundler.d/ansible.rb
 
 RUN (echo "---"; echo ":enabled: true") > config/settings.d/dynflow.yml
 RUN (echo "---"; echo ":enabled: true") > config/settings.d/remote_execution_ssh.yml
+RUN (echo "---"; echo ":enabled: true") > config/settings.d/ansible.yml
 
 RUN bundle --without bmc:krb5:libvirt:puppet_proxy_legacy:test:windows
 
