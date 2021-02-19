@@ -13,7 +13,10 @@
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.smart_proxy:
     name: "smart proxy in Docker"
-    url: "http://{{ foreman_smartproxy_container_name }}:8000"
+    ## Use a FQDN because some API endpoints (e.g. the one when
+    ## the smart proxy is done with some remote ssh execution)
+    ## perform DNS-based authentication:
+    url: "http://{{ foreman_smartproxy_container_name }}.{{ foreman_docker_network_name }}:8000"
     organizations:
       - "{{ foreman_main_organization_name }}"
     locations:
