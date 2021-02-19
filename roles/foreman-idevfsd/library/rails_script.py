@@ -79,7 +79,8 @@ class RailsScriptTask(object):
             postcondition=dict(type='str'),
             action=dict(type='str'),
             recheck=dict(type='bool'),
-            interpreter=dict(type='raw')))
+            interpreter=dict(type='raw',
+                             default = ["bundle", "exec", "rails", "console"])))
 
     def __init__(self):
         self.module = AnsibleModule(**self.module_spec)
@@ -87,9 +88,7 @@ class RailsScriptTask(object):
     def run(self):
         script = self._make_script()
 
-        interpreter = self.module.params.get("interpreter",
-                                             ["bundle", "exec",
-                                              "rails", "console"])
+        interpreter = self.module.params.get("interpreter")
         result = subprocess.run(interpreter,
                        check=True,
                        shell=isinstance(interpreter, six.string_types),
