@@ -45,6 +45,7 @@
     - foreman
     - foreman.config
     - foreman.config.os
+    - foreman.config.kubespray
 
 - include_vars:
     name: foreman_inventory

@@ -12,7 +12,7 @@
 - name: "Connect to smart proxy"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.smart_proxy:
-    name: "smart proxy in Docker"
+    name: "{{ foreman_smartproxy_name }}"
     ## Use a FQDN because some API endpoints (e.g. the one when
     ## the smart proxy is done with some remote ssh execution)
     ## perform DNS-based authentication:
@@ -87,3 +87,19 @@
       - "{{ foreman_main_organization_name }}"
     locations:
       - "{{ foreman_main_location_name }}"
+
+- name: "Import Ansible roles from smart proxy"
+  rails_script:
+    interpreter: "{{ foreman_docker_rails_interpreter }}"
+    action: |
+      changed = ForemanAnsible::ApiRolesImporter.new(
+          SmartProxy.find_by(:name => "{{ foreman_smartproxy_name }}")
+      ).import_role_names
+      changed_new = changed["new"]
+      if changed_new.empty?
+        exit_json(:changed => false)
+      else
+        changed_new.map(&:save)
+        exit_json(:changed => true, :new => changed_new.map(&:name))
+      end
+  tags: foreman.config.kubespray
