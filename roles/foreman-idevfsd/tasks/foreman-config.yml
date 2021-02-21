@@ -68,7 +68,6 @@
       ## This governs the main install process
     - operatingsystem: "Ubuntu 20.04"
       template_kind: "provision"
-      ## TODO: this template insists on setting up a root password.
       provisioning_template: "Preseed default"
     - operatingsystem: "Ubuntu 20.04"
       template_kind: "finish"
