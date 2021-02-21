@@ -73,10 +73,6 @@
     - operatingsystem: "Ubuntu 20.04"
       template_kind: "finish"
       provisioning_template: "Preseed default finish"
-      ## This ensures that Foreman obtains ssh access to the installed node
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "user_data"
-      provisioning_template: "Preseed default user data"
 
 - name: "Ubuntu 20.04 mirror"
   environment: "{{ foreman_api_environment }}"
