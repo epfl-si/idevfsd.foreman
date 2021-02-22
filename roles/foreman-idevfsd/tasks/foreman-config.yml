@@ -98,3 +98,22 @@
         exit_json(:changed => true, :new => changed_new.map(&:name))
       end
   tags: foreman.config.kubespray
+
+- name: "Import Ansible variables from smart proxy"
+  rails_script:
+    interpreter: "{{ foreman_docker_rails_interpreter }}"
+    action: |
+      new_vars = ForemanAnsible::VariablesImporter.new(
+          SmartProxy.find_by(:name => "{{ foreman_smartproxy_name }}")
+      ).import_variable_names([])["new"]
+
+      variables_we_want = JSON.parse {{ foreman_kubespray_ansible_variables
+                                        | to_json | quote }}
+      changed_new = new_vars.select {|v| variables_we_want.include? v.key }
+      if changed_new.empty?
+        exit_json(:changed => false)
+      else
+        changed_new.map(&:save)
+        exit_json(:changed => true, :new => changed_new.map(&:key))
+      end
+  tags: foreman.config.kubespray
