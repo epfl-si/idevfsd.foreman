@@ -16,6 +16,14 @@
   tags:
     - foreman.smartproxy.image
 
+- name: "{{ foreman_smartproxy_build_dir }}/docker-entrypoint.sh"
+  copy:
+    dest: "{{ foreman_smartproxy_build_dir }}/docker-entrypoint.sh"
+    content: >-
+      {{ lookup("template", "docker-entrypoint-smartproxy.sh") }}
+  tags:
+    - foreman.smartproxy.image
+
 - name: "{{ foreman_smartproxy_image }}"
   docker_image:
     name: "{{ foreman_smartproxy_image }}"
