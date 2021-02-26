@@ -31,11 +31,11 @@ RUN set -e -x; \
    find vendor -name node_modules -prune | xargs rm -rf
 
 ## Finishing
-RUN bundle install --without "${BUNDLER_SKIPPED_GROUPS}" assets
+RUN bundle install --with assets --without "${BUNDLER_SKIPPED_GROUPS}"
 RUN yes | bundle exec rails app:update:bin
 RUN set -e -x; \
   echo "ActiveRecord::Schema.define(version: 1) do end" > db/schema.rb; \
-  DATABASE_URL=nulldb://nohost bundle exec rake apipie:cache:index; \
+  DATABASE_URL=nulldb://nohost bundle exec rake assets:clean assets:precompile apipie:cache:index; \
   rm db/schema.rb
 RUN rm bundler.d/nulldb.rb
 
