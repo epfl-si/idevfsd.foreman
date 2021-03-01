@@ -21,6 +21,10 @@ foreman_frontend_mounts:
   - type: bind
     source: "{{ foreman_frontend_config_dir }}/settings.yaml"
     target: /home/foreman/config/settings.yaml
+  - type: bind
+    source: "{{ traefik_selfsigned_cert_path }}"
+    target: "{{ foreman_frontend_selfsigned_cert_path }}"
+foreman_frontend_selfsigned_cert_path: /etc/ssl/certs/traefik-selfsigned.pem
 
 foreman_smartproxy_build_dir: "{{ foreman_topdir }}/smartproxy/build"
 foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:{{ foreman_version }}"

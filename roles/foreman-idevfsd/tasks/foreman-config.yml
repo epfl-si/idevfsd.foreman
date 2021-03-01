@@ -30,6 +30,14 @@
     value: >-
       {{ foreman_frontend_url | replace("https://", "http://") }}
 
+- name: "ssl_ca_file"
+  ## Having a “real” CA is necessary for Foreman's new (in v2.3)
+  ## registration by dynamically-generated shell script feature:
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.setting:
+    name: "ssl_ca_file"
+    value: "{{ foreman_frontend_selfsigned_cert_path }}"
+
 - name: "Ubuntu 20.04"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.operatingsystem:
@@ -52,6 +60,7 @@
       - "Preseed default"
       - "Preseed default finish"
       - "Preseed default user data"
+      - "Linux registration default"
   tags:
     - foreman.config.os
 
@@ -72,6 +81,9 @@
     - operatingsystem: "Ubuntu 20.04"
       template_kind: "finish"
       provisioning_template: "Preseed default finish"
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "registration"
+      provisioning_template: "Linux registration default"
 
 - name: "Ubuntu 20.04 mirror"
   environment: "{{ foreman_api_environment }}"
