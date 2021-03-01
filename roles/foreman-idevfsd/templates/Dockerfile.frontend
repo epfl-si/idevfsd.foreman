@@ -10,7 +10,7 @@ RUN  microdnf install redhat-rpm-config git \
     libxml2-devel libcurl-devel ruby-devel \
     postgresql-devel
 USER 1001
-RUN echo "gem 'foreman_ansible'" > bundler.d/foreman_ansible.rb
+RUN echo "gem 'foreman_ansible', :git => 'https://github.com/epfl-si/foreman_ansible', :branch => 'prod'" > bundler.d/foreman_ansible.rb
 RUN echo "gem 'foreman_bootdisk'" > bundler.d/foreman_bootdisk.rb
 RUN echo "gem 'foreman_discovery'" > bundler.d/foreman_discovery.rb
 RUN echo "gem 'activerecord-nulldb-adapter'" > bundler.d/nulldb.rb
@@ -65,6 +65,7 @@ RUN set -e -x; exec > /etc/service/dynflow/run; \
 RUN chmod 755 /etc/service/*/run
 
 RUN rm -rf bin vendor bundler.d app public db && mkdir bin vendor bundler.d app public db
+COPY --from=kitchensink /home/foreman/Gemfile.lock /home/foreman/Gemfile.lock
 COPY --from=kitchensink /home/foreman/bin/ /home/foreman/bin/
 COPY --from=kitchensink /home/foreman/vendor/ /home/foreman/vendor/
 COPY --from=kitchensink /home/foreman/bundler.d/ /home/foreman/bundler.d/
