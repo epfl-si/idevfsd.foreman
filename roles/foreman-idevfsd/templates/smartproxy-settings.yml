@@ -1,5 +1,5 @@
 
-:foreman_url: "http://foreman_prod:3000/"
+:foreman_url: "http://{{ foreman_frontend_container_name }}:3000/"
 
 :bind_host: '0.0.0.0'
 :http_port: 8000
