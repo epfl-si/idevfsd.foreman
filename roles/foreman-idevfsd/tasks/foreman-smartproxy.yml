@@ -24,6 +24,14 @@
   tags:
     - foreman.smartproxy.image
 
+- name: "{{ foreman_smartproxy_build_dir }}/kubespray-fake-role-vars.yml"
+  copy:
+    dest: "{{ foreman_smartproxy_build_dir }}/kubespray-fake-role-vars.yml"
+    content: >-
+      {{ lookup("template", "kubespray-fake-role-vars.yml") }}
+  tags:
+    - foreman.smartproxy.image
+
 - name: "{{ foreman_smartproxy_image }}"
   docker_image:
     name: "{{ foreman_smartproxy_image }}"

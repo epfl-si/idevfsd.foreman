@@ -58,6 +58,10 @@ RUN cp /usr/share/kubespray/ansible.cfg /etc/ansible/
 # https://theforeman.org/plugins/foreman_ansible/3.x/index.html#2.1Ansiblecallback
 RUN perl -i -pe 's/(callback_whitelist.*)/\1, foreman/' /etc/ansible/ansible.cfg
 
+# Synthetic `kubespray` role that Ansible can import from
+RUN mkdir -p /usr/share/kubespray/roles/kubespray/defaults
+COPY kubespray-fake-role-vars.yml /usr/share/kubespray/roles/kubespray/defaults/main.yml
+
 COPY docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
 CMD /docker-entrypoint.sh
