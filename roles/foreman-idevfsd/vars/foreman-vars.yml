@@ -9,7 +9,7 @@ foreman_version: 2.3.2
 foreman_frontend_base_image: "quay.io/foreman/foreman:{{ foreman_version }}"
 foreman_frontend_build_dir: "{{ foreman_topdir }}/frontend/build"
 foreman_frontend_image: "epflidevfsd/foreman:{{ foreman_version }}"
-foreman_frontend_container_name: "foreman_{{ inventory_environment }}"
+foreman_frontend_container_name: "foreman-{{ inventory_environment }}"
 foreman_frontend_config_dir: "{{ foreman_topdir }}/frontend/config"
 foreman_frontend_mounts:
   - type: bind
@@ -28,7 +28,7 @@ foreman_frontend_selfsigned_cert_path: /etc/ssl/certs/traefik-selfsigned.pem
 
 foreman_smartproxy_build_dir: "{{ foreman_topdir }}/smartproxy/build"
 foreman_smartproxy_image: "epflidevfsd/foreman-smartproxy:{{ foreman_version }}"
-foreman_smartproxy_container_name: "smartproxy_{{ inventory_environment }}"
+foreman_smartproxy_container_name: "smartproxy-{{ inventory_environment }}"
 foreman_smartproxy_name: "smart proxy in Docker"
 foreman_smartproxy_config_dir: "{{ foreman_topdir }}/smartproxy/config"
 foreman_smartproxy_secrets_dir: "{{ foreman_topdir }}/smartproxy/secrets"

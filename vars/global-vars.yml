@@ -1,4 +1,4 @@
 traefik_external_https_port: 9090
 traefik_selfsigned_cert_path: /srv/traefik/certs/cert.pem
 foreman_frontend_url: https://itsidevfsd0005.xaas.epfl.ch:{{ traefik_external_https_port }}/
-foreman_docker_network_name: foreman_{{ inventory_environment }}
+foreman_docker_network_name: foreman-{{ inventory_environment }}
