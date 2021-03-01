@@ -46,6 +46,7 @@ platform_check () {
             SUITCASE_DIR=$PWD/ansible-deps-cache \
             SUITCASE_ANSIBLE_REQUIREMENTS=requirements.yml \
             SUITCASE_ANSIBLE_VERSION=2.10.3 \
+            SUITCASE_PIP_EXTRA=netaddr \
                         bash -x
     fi
     export PATH="$PWD/ansible-deps-cache/bin:$PATH"
