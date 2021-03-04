@@ -5,6 +5,7 @@ LABEL MAINTAINER="IDEV-FSD <idev-fsd@groupes.epfl.ch>"
 
 RUN dnf -y update
 RUN dnf -y install \
+    busybox \
     ruby{,-devel,gems,-irb} \
     sqlite-devel \
     rubygem-{nokogiri,bundler,unf_ext,rdoc} \
@@ -19,6 +20,7 @@ RUN dnf -y install \
     make \
     hostname \
  && dnf clean all
+RUN ln -s busybox /usr/sbin/runsv
 
 WORKDIR /usr/src/app
 

@@ -14,4 +14,15 @@ verify_certs = 0
 CALLBACK_FOREMAN
 fi
 
+mkdir -p /etc/service/smart-proxy
+cat > /etc/service/smart-proxy/run <<SCRIPT
+#!/bin/sh
+
+cd /usr/src/app
 exec bundle exec ./bin/smart-proxy
+
+SCRIPT
+chmod 0755 /etc/service/smart-proxy/run
+
+exec busybox runsvdir -P /etc/service
+
