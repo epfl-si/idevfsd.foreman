@@ -19,6 +19,7 @@ RUN dnf -y install \
     gcc-c++ \
     make \
     hostname \
+    patch \
  && dnf clean all
 RUN ln -s busybox /usr/sbin/runsv
 
@@ -51,6 +52,9 @@ RUN (echo "---"; echo ":enabled: true") > config/settings.d/ansible.yml
 RUN pip3 install ansible-runner
 
 RUN bundle --without bmc:krb5:libvirt:puppet_proxy_legacy:test:windows
+
+# Patch for https://projects.theforeman.org/issues/32028
+RUN curl https://patch-diff.githubusercontent.com/raw/theforeman/smart_proxy_ansible/pull/32.patch | (cd /usr/share/gems/bundler/gems/smart_proxy_ansible-*; patch -p1)
 
 # Add Kubespray and make it visible to Foreman's import feature
 RUN git clone https://github.com/kubernetes-sigs/kubespray.git /usr/share/kubespray
