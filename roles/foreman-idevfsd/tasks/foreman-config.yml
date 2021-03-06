@@ -139,3 +139,14 @@
       exit_json(:changed => ! changes.empty?,
                 :changes => changes)
   tags: foreman.config.kubespray
+
+- name: "“{{ foreman_kubespray_job_template_name }}” custom job template for ansible-runner"
+  include_tasks:
+    file: foreman-config-kubespray-job-template.yml
+    apply:
+      tags:
+        - foreman.config.kubespray
+        - foreman.config.kubespray.jobtemplate
+  tags:
+    - foreman.config.kubespray
+    - foreman.config.kubespray.jobtemplate

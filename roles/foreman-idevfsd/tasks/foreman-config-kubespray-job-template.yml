@@ -1,0 +1,33 @@
+- name: "Obtain content of the Kubespray playbook"
+  register: kubespray_playbooks
+  changed_when: false
+  shell:
+    cmd: |
+      docker exec {{ foreman_smartproxy_container_name }} cat /usr/share/kubespray/{{ item }}
+  with_items:
+    - cluster.yml
+    # Maybe we'll want more later.
+
+- set_fact:
+    kubespray_main_playbook: >-
+      {{ (kubespray_playbooks.results | selectattr("item", "equalto", "cluster.yml"))[0].stdout }}
+
+- name: "“{{ foreman_kubespray_job_template_name }}” custom Ansible job template"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.job_template:
+    name: "{{ foreman_kubespray_job_template_name }}"
+    template: >-
+      {{ lookup('template', 'playbook-default-kubespray.yml') }}
+    provider_type: Ansible
+    job_category: "Ansible Playbook"
+
+- name: "Use “{{ foreman_kubespray_job_template_name }}” for the “Run all Ansible roles” button"
+  rails_script:
+    interpreter: "{{ foreman_docker_rails_interpreter }}"
+    postcondition: |
+      RemoteExecutionFeature.find_by(:label => "ansible_run_host").job_template.name ==
+        "{{ foreman_kubespray_job_template_name }}"
+    action: |
+      f = RemoteExecutionFeature.find_by(:label => "ansible_run_host")
+      f.job_template = JobTemplate.find_by(:name => "{{ foreman_kubespray_job_template_name }}")
+      f.save

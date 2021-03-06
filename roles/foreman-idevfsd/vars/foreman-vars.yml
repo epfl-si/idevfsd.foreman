@@ -68,3 +68,5 @@ foreman_default_install:
   medium: "Ubuntu mirror"
   ptable: "Preseed default LVM"
 
+foreman_kubespray_job_template_name: >-
+  Ansible Roles - Default (+ Kubespray)

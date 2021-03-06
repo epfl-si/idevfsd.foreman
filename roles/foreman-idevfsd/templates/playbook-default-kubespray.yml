@@ -1,0 +1,11 @@
+<%-# Fall back to regular “Ansible - Default” template, unless the host group
+   # is set to apply exactly the “kubespray” role.
+   # Note: this is far from fool-proof, since foreman-ansible running ansible-runner
+   # ignores all rendered job templates except the first one. Do not attempt to mix
+   # and match Kubespray and non-Kubespray host groups in a single Ansible playbook run!
+  %>
+<% if (['kubespray'] != @host.hostgroup.all_ansible_roles.map { |role| role.name })  %>
+<%= render_template("Ansible Roles - Default") %>
+<% else %>
+{{ kubespray_main_playbook }}
+<% end %>
