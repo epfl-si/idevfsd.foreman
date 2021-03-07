@@ -3,7 +3,8 @@
 # Per-node variables:
 etcd_member_name: ""
 kubespray_is_kube_master: false
-kubespray_is_calico_rr_node: false
+kubespray_is_kube_node: false
+kubespray_is_calico_rr: false
 
 # Per-hostgroup variables:
 cluster_name: ""
