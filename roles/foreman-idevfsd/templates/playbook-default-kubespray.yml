@@ -48,6 +48,12 @@
         mode: "0644"
         content: |
           all:
+            vars:
+              {# For some reason, and as noted in the comments of
+               # https://stackoverflow.com/a/44734246/435004,
+               # ansible_ssh_private_key_file won't work as a regular
+               # per-host variable: -#}
+              ansible_ssh_private_key_file: /root/.ssh/id_rsa_foreman_proxy
             children:
               k8s-cluster:
                 hosts:
