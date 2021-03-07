@@ -130,6 +130,11 @@
       changes = []
       for v in kubespray_vars do
         v.override = true
+        # Absent support in foreman_ansible for tweaking smart prameters
+        # from the "edit host" page (like the thing that exists for Puppet
+        # smart parameters), it seems best for clarity to template them out
+        # of the like-named host parameter:
+        v.default_value = "<%= host_param(\"#{v.key}\") %>"
         if v.changed?
           changes.push v.key
           v.save

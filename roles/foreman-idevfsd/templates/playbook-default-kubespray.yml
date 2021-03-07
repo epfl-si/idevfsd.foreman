@@ -93,7 +93,8 @@
           {{{ "{%" }}} endfor %}
         etcd_nodes: |
           {{{ "{%" }}} for host in hostvars %}
-          {{{ "{%" }}} if hostvars[host].etcd_member_name is defined %}
+          {{{ "{%" }}} if ( (hostvars[host].etcd_member_name is defined) and
+                            (hostvars[host].etcd_member_name | length > 0) ) %}
           {{ host }}: {}
           {{{ "{%" }}} endif %}
           {{{ "{%" }}} endfor %}
