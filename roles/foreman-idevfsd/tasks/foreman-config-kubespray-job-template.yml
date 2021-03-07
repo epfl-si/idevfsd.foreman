@@ -17,7 +17,8 @@
   theforeman.foreman.job_template:
     name: "{{ foreman_kubespray_job_template_name }}"
     template: >-
-      {{ lookup('template', 'playbook-default-kubespray.yml') }}
+      {{ lookup('template', 'playbook-default-kubespray.yml',
+          variable_start_string='{{{', variable_end_string='}}}') }}
     provider_type: Ansible
     job_category: "Ansible Playbook"
 

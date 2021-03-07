@@ -1,3 +1,15 @@
+{# This file undergoes no less than three steps of macro-expansion,
+ # which are (in order):
+ #
+ #  Where              What                        Braces
+ #
+ #  Your workstation   Ansible `template` task     triple-mustache
+ #  Foreman            JobTemplate erb processing  pointy-angle percent
+ #  Smart proxy        ansible-runner              Single-mustache percent and
+ #                                                 double-mustache (i.e. “regular” Ansible)
+ #
+ # (For the overly curious, this here comment is eliminated in the first step.)
+ #}
 <%-# Fall back to regular “Ansible - Default” template, unless the host group
    # is set to apply exactly the “kubespray” role.
    # Note: this is far from fool-proof, since foreman-ansible running ansible-runner
@@ -7,5 +19,8 @@
 <% if (['kubespray'] != @host.hostgroup.all_ansible_roles.map { |role| role.name })  %>
 <%= render_template("Ansible Roles - Default") %>
 <% else %>
-{{ kubespray_main_playbook }}
+################################################################################
+# The remainder of this playbook is an adapted copy of /usr/share/kubespray/cluster.yml
+
+{{{ kubespray_main_playbook }}}
 <% end %>
