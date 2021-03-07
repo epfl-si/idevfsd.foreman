@@ -57,7 +57,9 @@ USER 1001
 RUN mkdir -p /etc/service/{foreman-frontend,dynflow}
 RUN set -e -x; exec > /etc/service/foreman-frontend/run; \
   echo "#!/bin/sh"; echo "set -e -x"; \
-  echo "cd /home/foreman"; echo "exec bundle exec bin/rails server"
+  echo "cd /home/foreman"; \
+  echo "rm -f tmp/pids/server.pid || true"; \
+  echo "exec bundle exec bin/rails server"
 
 RUN set -e -x; exec > /etc/service/dynflow/run; \
   echo "#!/bin/sh"; echo "set -e -x"; \
