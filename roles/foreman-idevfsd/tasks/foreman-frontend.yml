@@ -35,6 +35,7 @@
   with_items:
     - database.yml
     - settings.yaml
+    - foreman_column_view.yaml
   register: _foreman_configuration_files
 
 - name: "`rake db:migrate` (schema creation / upgrade)"

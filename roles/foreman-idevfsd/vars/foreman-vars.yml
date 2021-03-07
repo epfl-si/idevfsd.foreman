@@ -23,6 +23,9 @@ foreman_frontend_mounts:
     source: "{{ foreman_frontend_config_dir }}/settings.yaml"
     target: /home/foreman/config/settings.yaml
   - type: bind
+    source: "{{ foreman_frontend_config_dir }}/foreman_column_view.yaml"
+    target: /home/foreman/config/settings.plugins.d/foreman_column_view.yaml
+  - type: bind
     source: "{{ traefik_selfsigned_cert_path }}"
     target: "{{ foreman_frontend_selfsigned_cert_path }}"
 foreman_frontend_selfsigned_cert_path: /etc/ssl/certs/traefik-selfsigned.pem

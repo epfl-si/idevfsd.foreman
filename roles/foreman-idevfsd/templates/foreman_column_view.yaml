@@ -1,0 +1,16 @@
+{# Configuration for additional kubespray-friendly columns in the “all hosts” table
+ # See https://github.com/theforeman/foreman_column_view#configuration for details
+ #}
+:column_view:
+  :etcd_member_name:
+    :title: etcd member name
+    :after: last_report
+    :content: params['etcd_member_name']
+  :kubespray_is_kube_master:
+    :title: kube master
+    :after: etcd_member_name
+    :content: params['kubespray_is_kube_master']
+  :kubespray_is_kube_node:
+    :title: kube worker
+    :after: kubespray_is_kube_master
+    :content: params['kubespray_is_kube_node']

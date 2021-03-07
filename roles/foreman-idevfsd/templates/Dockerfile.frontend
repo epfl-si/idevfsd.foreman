@@ -15,6 +15,7 @@ RUN echo "gem 'foreman_ansible', :git => 'https://github.com/epfl-si/foreman_ans
 RUN echo "gem 'foreman_bootdisk'" > bundler.d/foreman_bootdisk.rb
 RUN echo "gem 'foreman_discovery'" > bundler.d/foreman_discovery.rb
 RUN echo "gem 'activerecord-nulldb-adapter'" > bundler.d/nulldb.rb
+RUN echo "gem 'foreman_column_view'" > bundler.d/foreman_column_view.rb
 
 RUN bundle install
 
@@ -51,6 +52,8 @@ USER 0
 RUN microdnf install findutils busybox && microdnf clean all
 RUN ln -s busybox /usr/sbin/runsv
 RUN mkdir /etc/service; chown 1001 /etc/service
+
+RUN mkdir config/settings.plugins.d
 
 USER 1001
 
