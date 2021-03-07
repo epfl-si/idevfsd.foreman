@@ -10,6 +10,7 @@ RUN  microdnf install redhat-rpm-config git \
     libxml2-devel libcurl-devel ruby-devel \
     postgresql-devel
 USER 1001
+RUN echo "gem 'foreman-tasks', '{{ foreman_tasks_version }}'" > bundler.d/foreman_tasks.rb
 RUN echo "gem 'foreman_ansible', :git => 'https://github.com/epfl-si/foreman_ansible', :branch => 'prod'" > bundler.d/foreman_ansible.rb
 RUN echo "gem 'foreman_bootdisk'" > bundler.d/foreman_bootdisk.rb
 RUN echo "gem 'foreman_discovery'" > bundler.d/foreman_discovery.rb

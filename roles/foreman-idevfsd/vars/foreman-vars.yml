@@ -6,6 +6,7 @@ foreman_postgres_storage_dir: "{{ foreman_topdir }}/postgres/data"
 foreman_postgres_initdb_sql_script: "{{ foreman_topdir }}/postgres/initdb.sql"
 
 foreman_version: 2.3.2
+foreman_tasks_version: 3.0.5  # 4.0.0 wants foreman_version = 2.4.0
 foreman_frontend_base_image: "quay.io/foreman/foreman:{{ foreman_version }}"
 foreman_frontend_build_dir: "{{ foreman_topdir }}/frontend/build"
 foreman_frontend_image: "epflidevfsd/foreman:{{ foreman_version }}"
