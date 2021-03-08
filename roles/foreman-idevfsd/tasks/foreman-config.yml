@@ -38,62 +38,14 @@
     name: "ssl_ca_file"
     value: "{{ foreman_frontend_selfsigned_cert_path }}"
 
-- name: "Ubuntu 20.04"
-  environment: "{{ foreman_api_environment }}"
-  theforeman.foreman.operatingsystem:
-    name: Ubuntu
-    release_name: focal
-    family: Debian
-    major: "20"
-    minor: "04"
-    password_hash: SHA256
-    ## Literal values below are all pre-seeded during Foreman install
-    architectures:
-      - x86_64
-    media:
-      - "Ubuntu mirror"
-    ptables:
-      - "Preseed default LVM"
-    provisioning_templates:
-      ## See explanations below
-      - "Discovery Debian kexec"
-      - "Preseed default"
-      - "Preseed default finish"
-      - "Preseed default user data"
-      - "Linux registration default"
+- name: "Foreman configuration - Settings related to OSes and installation"
+  include_tasks:
+    file: foreman-config-os.yml
+    apply:
+      tags:
+        - foreman.config.os
   tags:
     - foreman.config.os
-
-- name: "Ubuntu 20.04 default templates"
-  environment: "{{ foreman_api_environment }}"
-  theforeman.foreman.os_default_template: "{{ item }}"
-  with_items:
-    - operatingsystem: "Ubuntu 20.04"
-      ## This says how the PXE-less discovery process
-      ## (https://theforeman.org/plugins/foreman_discovery/15.0/index.html#5.3PXE-lessdiscovery)
-      ## boots into install mode:
-      template_kind: "kexec"
-      provisioning_template: "Discovery Debian kexec"
-      ## This governs the main install process
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "provision"
-      provisioning_template: "Preseed default"
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "finish"
-      provisioning_template: "Preseed default finish"
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "registration"
-      provisioning_template: "Linux registration default"
-
-- name: "Ubuntu 20.04 mirror"
-  environment: "{{ foreman_api_environment }}"
-  theforeman.foreman.installation_medium:
-    name: "Ubuntu mirror"
-    path: "http://install.iccluster.epfl.ch/mirrors/ubuntu/ubuntu"
-    organizations:
-      - "{{ foreman_main_organization_name }}"
-    locations:
-      - "{{ foreman_main_location_name }}"
 
 - name: "Import `kubespray' Ansible role from smart proxy"
   # There no `kubespray` role in Kubespray. This is a fake role that

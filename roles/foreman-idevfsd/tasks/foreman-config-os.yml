@@ -1,0 +1,108 @@
+- include_vars:
+    name: foreman_inventory
+    file: "../../../managed-inventory.yml"
+  tags: always
+
+- name: Install the YAML Python API
+  pip:
+    executable: pip3
+    name:
+      - PyYAML
+    state: latest
+
+- name: "Ubuntu 20.04"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.operatingsystem:
+    name: Ubuntu
+    release_name: focal
+    family: Debian
+    major: "20"
+    minor: "04"
+    password_hash: SHA256
+    ## Literal values below are all pre-seeded during Foreman install
+    architectures:
+      - x86_64
+    media:
+      - "Ubuntu mirror"
+    ptables:
+      - "Preseed default LVM"
+    provisioning_templates:
+      ## See explanations below
+      - "Discovery Debian kexec"
+      - "Preseed default"
+      - "Preseed default finish"
+      - "Preseed default user data"
+      - "Linux registration default"
+  tags:
+    - foreman.config.os
+
+- name: "Ubuntu 20.04 default templates"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.os_default_template: "{{ item }}"
+  with_items:
+    - operatingsystem: "Ubuntu 20.04"
+      ## This says how the PXE-less discovery process
+      ## (https://theforeman.org/plugins/foreman_discovery/15.0/index.html#5.3PXE-lessdiscovery)
+      ## boots into install mode:
+      template_kind: "kexec"
+      provisioning_template: "Discovery Debian kexec"
+      ## This governs the main install process
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "provision"
+      provisioning_template: "Preseed default"
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "finish"
+      provisioning_template: "Preseed default finish"
+    - operatingsystem: "Ubuntu 20.04"
+      template_kind: "registration"
+      provisioning_template: "Linux registration default"
+
+- name: "Ubuntu 20.04 mirror"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.installation_medium:
+    name: "Ubuntu mirror"
+    path: "http://install.iccluster.epfl.ch/mirrors/ubuntu/ubuntu"
+    organizations:
+      - "{{ foreman_main_organization_name }}"
+    locations:
+      - "{{ foreman_main_location_name }}"
+
+- name: "Preseed default finish custom snippet"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.provisioning_template:
+    # As the name implies, `Preseed default finish` calls out to this one
+    name: "Preseed default finish custom snippet"
+    kind: snippet
+    template: |
+      <% if !( host_param('epfl_root_authorized_keys').blank? ||
+               host_param('epfl_root_authorized_keys').strip.empty? ) %>
+      # Add ssh keys from Foreman's 'epfl_root_authorized_keys' host / hostgroup parameter
+      mkdir -p ~root/.ssh
+      cat << EOF > ~root/.ssh/authorized_keys
+      <%= host_param('epfl_root_authorized_keys') %>
+      EOF
+
+      chmod 0700 ~root/.ssh
+      chmod 0600 ~root/.ssh/authorized_keys
+      chown -R root: ~root/.ssh
+
+      # Apply SELinux context with restorecon, if available:
+      command -v restorecon && restorecon -RvF ~root/.ssh || true
+      <% end %>
+
+      <%= snippet_if_exists(@host.hostgroup.to_s + " finish snippet") %>
+
+- name: "Per-hostgroup finish snippets"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.provisioning_template:
+    name: "{{ hostgroup_name }} finish snippet"
+    kind: snippet
+    template: |
+      {{ hostgroup["finish_snippet"] }}
+  vars:
+    hostgroup: "{{ foreman_inventory[hostgroup_name] }}"
+  when: >-
+    "finish_snippet" in hostgroup
+  with_items: "{{ foreman_inventory.keys() }}"
+  loop_control:
+    loop_var: hostgroup_name
