@@ -74,3 +74,33 @@ foreman_default_install:
 
 foreman_kubespray_job_template_name: >-
   Ansible Roles - Default (+ Kubespray)
+
+# https://github.com/kubernetes-sigs/kubespray/blob/master/docs/vars.md
+foreman_hostgroup_ansible_vars:
+- name: cluster_name
+  type: string
+  default_value: "{{ hostgroup_name }}"
+- name: dns_domain
+  type: string
+  default_value: "{{ hostgroup_name }}.local"
+- name: kube_service_addresses
+  type: string
+  default_value: "172.30.0.0/16"   # Camptocamp-OpenShift-style
+- name: kube_pods_subnet
+  type: string
+  default_value: "172.31.0.0/16"   # Ditto
+- name: kube_network_node_prefix
+  type: integer
+  default_value: 23                # Leaving room for ~126 nodes running ~510 pods each
+- name: enable_dual_stack_networks
+  type: boolean
+  default_value: true
+- name: kube_service_addresses_ipv6
+  type: string
+  default_value: "{{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(64, 0) }}"
+- name: kube_pods_subnet_ipv6
+  type: string
+  default_value: "{{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(64, 1) }}"
+- name: kube_network_node_prefix_ipv6
+  type: integer
+  default_value: 96

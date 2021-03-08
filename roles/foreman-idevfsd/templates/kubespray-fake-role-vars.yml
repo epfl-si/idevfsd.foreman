@@ -1,4 +1,8 @@
-# https://github.com/kubernetes-sigs/kubespray/blob/master/docs/vars.md
+{# Variables and bogus default values for a nonexistent `kubespray`
+ # role, that Ansible will import.
+ #
+ # The actual management of these values is done under -t foreman.config.kubespray
+ #}
 
 # Per-node variables:
 etcd_member_name: ""
@@ -7,14 +11,12 @@ kubespray_is_kube_node: false
 kubespray_is_calico_rr: false
 
 # Per-hostgroup variables:
-cluster_name: ""
-container_manager: ""
-dns_domain: ""
-kube_service_addresses: "172.30.0.0/16"   # Camptocamp-OpenShift-style
-kube_pods_subnet: "172.31.0.0/16"   # Ditto
-kube_network_node_prefix: "23"              # Leaving room for ~126 nodes running ~510 pods each
-enable_dual_stack_networks: yes
-kube_service_addresses_ipv6: ""
-kube_pods_subnet_ipv6: ""
-kube_network_node_prefix_ipv6: 96
-etcd_kubeadm_enabled: false
+{% for var in foreman_hostgroup_ansible_vars %}
+{% if var.type == "string" %}
+{{ var.name }}: ""
+{% elif var.type == "boolean" %}
+{{ var.name }}: false
+{% elif var.type == "integer" %}
+{{ var.name }}: 0
+{% endif %}
+{% endfor %}

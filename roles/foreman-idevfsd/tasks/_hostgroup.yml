@@ -45,7 +45,11 @@
     ptable: >-
       {{ hostgroup.ptable
          | default(foreman_default_install.ptable) }}
-    parameters:
+    parameters: "{{ fixed_parameters + managed_parameters | from_yaml }}"
+  vars:
+    ssh_keys: >-
+      {{ hostgroup.root_ssh_keys }}
+    fixed_parameters:
       - name: host_registration_remote_execution
         parameter_type: boolean
         value: >-
@@ -54,9 +58,12 @@
         parameter_type: string
         value: >-
           {{ lookup("template", "ssh_keys") }}
-  vars:
-    ssh_keys: >-
-      {{ hostgroup.root_ssh_keys }}
+    managed_parameters: |
+      {% for var in foreman_hostgroup_ansible_vars %}
+      - name: {{ var.name }}
+        parameter_type: {{ var.type }}
+        value: {{ hostgroup.parameters[var.name] | default(var.default_value) }}
+      {% endfor %}
 
 - name: "{{ hostgroup_name }} root password (not useable over the network)"
   environment: "{{ foreman_api_environment }}"
