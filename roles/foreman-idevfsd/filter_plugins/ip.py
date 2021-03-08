@@ -23,5 +23,5 @@ def ipv6_ula(seed):
     hasher.update("EPFL".encode("utf-8"))
     hasher.update(seed.encode("utf-8"))
     seed_hex = hasher.hexdigest()
-    prefix = re.sub("(....)", "\\1:", "fc%s" % seed_hex)[:9]
-    return "%s::/48" % prefix
+    prefix = re.sub("(....)", "\\1:", "fc%s" % seed_hex)[2:14]
+    return "fc%s::/48" % prefix
