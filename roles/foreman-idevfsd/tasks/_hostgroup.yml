@@ -102,7 +102,7 @@
         changes[:hostname].append "{{ host.name }}"
       end
 
-      search = "mac = {{ host.macaddress }}"
+      search = "mac = {{ host.mac }}"
       if rule.search != search
         rule.search = search
         changes[:search].append "{{ host.name }}"
@@ -118,3 +118,24 @@
 
       exit_json(:changed => (not changes.values.flatten.empty?),
                 :changes => changes)
+
+- name: "Hosts of {{ hostgroup_name }}"
+  with_items: "{{ hostgroup.hosts }}"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.host:
+    name: >-
+      {{ item.fqdn | default(item.name + "." + hostgroup.domain) }}
+    hostgroup: "{{ hostgroup_name }}"
+    mac: >-
+      {{ item.mac | default(None) }}
+    ip: >-
+      {{ item.ip  | default(None) }}
+    organization: >-
+      {{ hostgroup.organization
+         | default(foreman_main_organization_name) }}
+    location: >-
+      {{ hostgroup.location
+         | default(foreman_main_location_name) }}
+    operatingsystem: Ubuntu 20.04
+    architecture: x86_64
+    parameters: "{{ item.parameters | as_foreman_parameters }}"

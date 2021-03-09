@@ -24,10 +24,21 @@ idevfsdesis:
       login: greglebarbar
 
   hosts:
+    - name: itsidevfsd0012
+      mac: 00:50:56:84:66:c7
+      ip: 10.95.80.132
+      parameters:
+        etcd_member_name: 1-itsidevfsd0009
+        kubespray_is_kube_master: true
+
     - name: itsidevfsd0009
-      macaddress: 00:50:56:84:39:3b
+      mac: 00:50:56:84:39:3b
       ip: 10.95.80.81
+      parameters:
+        kubespray_is_kube_node: true
 
     - name: itsidevfsd0010
-      macaddress: 00:50:56:84:d6:a8
+      mac: 00:50:56:84:d6:a8
       ip: 10.95.80.84
+      parameters:
+        kubespray_is_kube_node: true
