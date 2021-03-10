@@ -14,7 +14,7 @@
 
 - name: 'PostgreSQL database'
   docker_container:
-    name: "postgresql_{{ inventory_environment }}"
+    name: "postgresql-{{ inventory_environment }}"
     image: "{{ foreman_postgres_image }}"
     detach: yes
     restart_policy: unless-stopped
