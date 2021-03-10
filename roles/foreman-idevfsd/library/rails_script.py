@@ -193,7 +193,7 @@ exit_json(:changed => false, :failed => true)
 """
             
 
-        if (postcondition and self.module.params.get("recheck", False)):
+        if (postcondition and self.module.params.get("recheck", True)):
             script = script + """
                 
 if ! ansible_postcondition_
