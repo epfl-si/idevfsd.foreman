@@ -107,11 +107,16 @@ module IDEVFSD
     extend ActiveSupport::Concern
 
     included do
-      before_action :wrap_host_if_kexecable, :only => [:review_before_build, :setBuild]
+      before_action :wrap_host_if_kexecable,  :only => [:review_before_build, :setBuild]
+      before_action :wrap_hosts_if_kexecable, :only => [:submit_multiple_build]
     end
 
     def wrap_host_if_kexecable
       @host = KexecService::wrap_if_kexecable @host
+    end
+
+    def wrap_hosts_if_kexecable
+      @hosts = @hosts.map { |h| KexecService::wrap_if_kexecable h }
     end
   end
 
