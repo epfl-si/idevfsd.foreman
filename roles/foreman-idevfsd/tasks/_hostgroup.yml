@@ -65,6 +65,19 @@
         value: {{ hostgroup.parameters[var.name] | default(var.default_value) }}
       {% endfor %}
 
+- name: "Add `kubespray` role to host group"
+  rails_script:
+    interpreter: "{{ foreman_docker_rails_interpreter }}"
+    action: |
+      hostgroup = Hostgroup.find_by :name => "{{ hostgroup_name }}"
+      role = AnsibleRole.find_by :name => "kubespray"
+      
+      if role.hostgroups.include? hostgroup
+        exit_json(:changed => false)
+      else
+        role.hostgroups.push hostgroup
+      end
+      
 - name: "{{ hostgroup_name }} root password (not useable over the network)"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.hostgroup:
