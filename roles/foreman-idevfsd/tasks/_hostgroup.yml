@@ -76,49 +76,6 @@
   ## password cannot be retrieved". Sigh
   changed_when: false
 
-- name: "Discovery rules"
-  rails_script:
-    interpreter: "{{ foreman_docker_rails_interpreter }}"
-    action: |
-      changes = { :created => [], :hostname => [],
-                  :search => [], :hostgroup => [] }
-      {% for host in hostgroup.hosts %}
-      {% set rule_name = host.name + "@" + hostgroup_name %}
-      hostgroup = Hostgroup.find_by(name: "{{ hostgroup_name }}")
-
-      rule = DiscoveryRule.find_or_create_by(name: "{{ rule_name }}")
-      if rule.id.nil? then changes[:created].append "{{ host.name }}" end
-
-      {# Those are requirements of the ActiveRecord model,
-       # and therefore do not count as changes. #}
-      rule.organizations = hostgroup.organizations
-      rule.locations = hostgroup.locations
-      if rule.priority == 0
-        rule.priority = DiscoveryRule::suggest_priority
-      end
-
-      if rule.hostname != "{{ host.name }}"
-        rule.hostname = "{{ host.name }}"
-        changes[:hostname].append "{{ host.name }}"
-      end
-
-      search = "mac = {{ host.mac }}"
-      if rule.search != search
-        rule.search = search
-        changes[:search].append "{{ host.name }}"
-      end
-
-      if rule.hostgroup != hostgroup
-        rule.hostgroup = hostgroup
-        changes[:hostgroup].append "{{ host.name }}"
-      end
-
-      rule.save or raise "Could not save rule {{ rule_name }}"
-      {% endfor %}
-
-      exit_json(:changed => (not changes.values.flatten.empty?),
-                :changes => changes)
-
 - name: "Hosts of {{ hostgroup_name }}"
   with_items: "{{ hostgroup.hosts }}"
   environment: "{{ foreman_api_environment }}"

@@ -79,4 +79,6 @@ COPY --from=kitchensink /home/foreman/app/ /home/foreman/app/
 COPY --from=kitchensink /home/foreman/public/ /home/foreman/public/
 COPY --from=kitchensink /home/foreman/db/ /home/foreman/db/
 
+COPY kexec_ext.rb config/initializers/
+
 CMD busybox runsvdir -P /etc/service
