@@ -90,6 +90,10 @@
       command -v restorecon && restorecon -RvF ~root/.ssh || true
       <% end %>
 
+      # Install open-vm-tools (https://docs.vmware.com/en/VMware-Tools/11.2.0/com.vmware.vsphere.vmwaretools.doc/GUID-C48E1F14-240D-4DD1-8D4C-25B6EBE4BB0F.html)
+      apt-get -qy update
+      apt-get -qy install open-vm-tools
+
       <%= snippet_if_exists(@host.hostgroup.to_s + " finish snippet") %>
 
 - name: "Per-hostgroup finish snippets"
