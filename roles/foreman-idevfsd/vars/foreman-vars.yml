@@ -95,12 +95,18 @@ foreman_hostgroup_ansible_vars:
 - name: enable_dual_stack_networks
   type: boolean
   default_value: true
-- name: kube_service_addresses_ipv6
-  type: string
-  default_value: "{{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(64, 0) }}"
 - name: kube_pods_subnet_ipv6
   type: string
-  default_value: "{{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(64, 1) }}"
+  # kubeadm doesn't believe in clusters with more than 65535 nodes (https://github.com/kubernetes/kubernetes/blob/master/cmd/kubeadm/app/constants/constants.go#L215):
+  default_value: >-
+    {{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(80, 0) }}"
 - name: kube_network_node_prefix_ipv6
   type: integer
   default_value: 96
+  # Kubeadm also doesn't believe in zillions of services
+  # (op. cit., https://github.com/kubernetes/kubernetes/blob/master/cmd/kubeadm/app/constants/constants.go#L206):
+- name: kube_service_addresses_ipv6
+  type: string
+  default_value: >-
+    {{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(80, 1)
+                                 | ansible.netcommon.ipsubnet(112, 0) }}
