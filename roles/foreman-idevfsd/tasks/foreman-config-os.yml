@@ -38,23 +38,20 @@
 
 - name: "Ubuntu 20.04 default templates"
   environment: "{{ foreman_api_environment }}"
-  theforeman.foreman.os_default_template: "{{ item }}"
+  theforeman.foreman.os_default_template: >-
+    {{ item.update({"operatingsystem": "Ubuntu 20.04" }) | default(item, true) }}
   with_items:
-    - operatingsystem: "Ubuntu 20.04"
       ## This says how the PXE-less discovery process
       ## (https://theforeman.org/plugins/foreman_discovery/15.0/index.html#5.3PXE-lessdiscovery)
       ## boots into install mode:
-      template_kind: "kexec"
+    - template_kind: "kexec"
       provisioning_template: "Discovery Debian kexec"
       ## This governs the main install process
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "provision"
+    - template_kind: "provision"
       provisioning_template: "Preseed default"
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "finish"
+    - template_kind: "finish"
       provisioning_template: "Preseed default finish"
-    - operatingsystem: "Ubuntu 20.04"
-      template_kind: "registration"
+    - template_kind: "registration"
       provisioning_template: "Linux registration default"
 
 - name: "Ubuntu 20.04 mirror"
