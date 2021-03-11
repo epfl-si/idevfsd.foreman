@@ -99,7 +99,7 @@ foreman_hostgroup_ansible_vars:
   type: string
   # kubeadm doesn't believe in clusters with more than 65535 nodes (https://github.com/kubernetes/kubernetes/blob/master/cmd/kubeadm/app/constants/constants.go#L215):
   default_value: >-
-    {{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(80, 0) }}"
+    {{ hostgroup_name | ipv6_ula | replace("::/48", "::/80") }}
 - name: kube_network_node_prefix_ipv6
   type: integer
   default_value: 96
@@ -108,5 +108,4 @@ foreman_hostgroup_ansible_vars:
 - name: kube_service_addresses_ipv6
   type: string
   default_value: >-
-    {{ hostgroup_name | ipv6_ula | ansible.netcommon.ipsubnet(80, 1)
-                                 | ansible.netcommon.ipsubnet(112, 0) }}
+    {{ hostgroup_name | ipv6_ula | replace("::/48", ":0:0:1::/112") }}
