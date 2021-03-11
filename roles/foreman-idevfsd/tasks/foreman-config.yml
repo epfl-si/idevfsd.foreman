@@ -38,15 +38,6 @@
     name: "ssl_ca_file"
     value: "{{ foreman_frontend_selfsigned_cert_path }}"
 
-- name: "Foreman configuration - Settings related to OSes and installation"
-  include_tasks:
-    file: foreman-config-os.yml
-    apply:
-      tags:
-        - foreman.config.os
-  tags:
-    - foreman.config.os
-
 - name: "Import `kubespray' Ansible role from smart proxy"
   # There no `kubespray` role in Kubespray. This is a fake role that
   # the Docker entry point script sets up (see
@@ -96,14 +87,3 @@
       exit_json(:changed => ! changes.empty?,
                 :changes => changes)
   tags: foreman.config.kubespray
-
-- name: "“{{ foreman_kubespray_job_template_name }}” custom job template for ansible-runner"
-  include_tasks:
-    file: foreman-config-kubespray-job-template.yml
-    apply:
-      tags:
-        - foreman.config.kubespray
-        - foreman.config.kubespray.jobtemplate
-  tags:
-    - foreman.config.kubespray
-    - foreman.config.kubespray.jobtemplate

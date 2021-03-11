@@ -44,7 +44,29 @@
   tags:
     - foreman
     - foreman.config
+
+- name: "Foreman configuration - Settings related to OSes and installation"
+  include_tasks:
+    file: foreman-config-os.yml
+    apply:
+      tags:
+        - foreman
+        - foreman.config
+        - foreman.config.os
+  tags:
+    - foreman
+    - foreman.config
     - foreman.config.os
+
+- name: "“{{ foreman_kubespray_job_template_name }}” custom job template for ansible-runner"
+  include_tasks:
+    file: foreman-config-kubespray-job-template.yml
+    apply:
+      tags:
+        - foreman.config.kubespray
+  tags:
+    - foreman
+    - foreman.config
     - foreman.config.kubespray
     - foreman.config.kubespray.jobtemplate
 
