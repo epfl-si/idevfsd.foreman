@@ -53,6 +53,7 @@
       provisioning_template: "Preseed default finish"
     - template_kind: "registration"
       provisioning_template: "Linux registration default"
+  tags: foreman.config.os.templates
 
 - name: "Ubuntu 20.04 mirror"
   environment: "{{ foreman_api_environment }}"

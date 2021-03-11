@@ -57,6 +57,7 @@
     - foreman
     - foreman.config
     - foreman.config.os
+    - foreman.config.os.templates
 
 - name: "“{{ foreman_kubespray_job_template_name }}” custom job template for ansible-runner"
   include_tasks:
