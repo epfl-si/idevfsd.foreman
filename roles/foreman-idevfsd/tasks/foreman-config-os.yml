@@ -29,6 +29,7 @@
     provisioning_templates:
       ## See explanations below
       - "Discovery Debian kexec"
+      - "Preseed default iPXE"
       - "Preseed default"
       - "Preseed default finish"
       - "Preseed default user data"
@@ -53,6 +54,8 @@
       provisioning_template: "Preseed default finish"
     - template_kind: "registration"
       provisioning_template: "Linux registration default"
+    - template_kind: "iPXE"
+      provisioning_template: "Preseed default iPXE"
   tags: foreman.config.os.templates
 
 - name: "Ubuntu 20.04 mirror"
