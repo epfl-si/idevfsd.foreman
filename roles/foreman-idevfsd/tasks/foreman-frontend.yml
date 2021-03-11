@@ -19,9 +19,8 @@
 
 - name: "{{ foreman_frontend_build_dir }}/kexec_ext.rb"
   copy:
+    src: kexec_ext.rb
     dest: "{{ foreman_frontend_build_dir }}/kexec_ext.rb"
-    content: >-
-      {{ lookup("template", "kexec_ext.rb") }}
   tags:
     - foreman.frontend.image
 
