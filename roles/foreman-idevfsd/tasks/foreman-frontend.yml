@@ -72,7 +72,14 @@
     ("migrated" in _foreman_db_migrate.container.Output)
 
 - name: "`rake db:seed` (populate initial data)"
-  when: _foreman_db_migrate is changed
+  when: >-
+    (
+      (_foreman_db_migrate is defined)
+      and
+      (_foreman_db_migrate is changed)
+    )
+    or
+    ("foreman.frontend.db_seed" in ansible_run_tags)
   docker_container:
     name: "foreman_{{ inventory_environment }}_db_seed"
     image: "{{ foreman_frontend_image }}"
@@ -91,6 +98,7 @@
       SEED_LOCATION: "{{ foreman_main_location_name }}"
       ## Fun fact: there are no other taxonomy types (as of Foreman
       ## 2.3.2)
+  tags: foreman.frontend.db_seed
 
 - name: "Foreman front-end running in Docker"
   docker_container:

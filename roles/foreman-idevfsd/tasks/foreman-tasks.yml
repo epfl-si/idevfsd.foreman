@@ -33,6 +33,7 @@
     - foreman.frontend
     - foreman.frontend.image
     - foreman.frontend.dockerfile
+    - foreman.frontend.db_seed
 
 - name: "Foreman configuration"
   include_tasks:
