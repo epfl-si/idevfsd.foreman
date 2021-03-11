@@ -17,10 +17,13 @@
     - foreman.frontend.image
     - foreman.frontend.dockerfile
 
-- name: "{{ foreman_frontend_build_dir }}/kexec_ext.rb"
+- name: "Homemade Ruby initializers"
   copy:
-    src: kexec_ext.rb
-    dest: "{{ foreman_frontend_build_dir }}/kexec_ext.rb"
+    src: "{{ item }}"
+    dest: "{{ foreman_frontend_build_dir }}/{{ item }}"
+  with_items:
+    - kexec_ext.rb
+    - ip_from_request_env.rb
   tags:
     - foreman.frontend.image
 
