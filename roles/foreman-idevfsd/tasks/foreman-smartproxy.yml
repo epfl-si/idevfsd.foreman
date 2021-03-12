@@ -24,17 +24,6 @@
   tags:
     - foreman.smartproxy.image
 
-- name: "{{ foreman_smartproxy_build_dir }}/kubespray-fake-role-vars.yml"
-  copy:
-    dest: "{{ foreman_smartproxy_build_dir }}/kubespray-fake-role-vars.yml"
-    content: >-
-      {{ lookup("template", "kubespray-fake-role-vars.yml") }}
-  vars:
-    hostgroup_name: "something bogus to prevent undefined errors in foreman_hostgroup_ansible_vars's .default_value's - the template only cares about .name's and .type's anyway"
-
-  tags:
-    - foreman.smartproxy.image
-
 - name: "{{ foreman_smartproxy_image }}"
   docker_image:
     name: "{{ foreman_smartproxy_image }}"

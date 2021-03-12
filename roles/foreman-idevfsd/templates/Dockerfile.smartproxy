@@ -56,17 +56,12 @@ RUN bundle --without bmc:krb5:libvirt:puppet_proxy_legacy:test:windows
 # IDEV-FSD contributed patches
 RUN curl https://patch-diff.githubusercontent.com/raw/theforeman/foreman_ansible/pull/391.patch | (cd /usr/share/gems/bundler/gems/foreman_ansible-*; patch -p1)
 
-# Add Kubespray and make it visible to Foreman's import feature
+# Add Kubespray
 RUN git clone https://github.com/kubernetes-sigs/kubespray.git /usr/share/kubespray
 RUN pip3 install -r /usr/share/kubespray/requirements.txt
-RUN cp /usr/share/kubespray/ansible.cfg /etc/ansible/
 
 # https://theforeman.org/plugins/foreman_ansible/3.x/index.html#2.1Ansiblecallback
-RUN perl -i -pe 's/(callback_whitelist.*)/\1, foreman/' /etc/ansible/ansible.cfg
-
-# Synthetic `kubespray` role that Ansible can import from
-RUN mkdir -p /usr/share/kubespray/roles/kubespray/defaults
-COPY kubespray-fake-role-vars.yml /usr/share/kubespray/roles/kubespray/defaults/main.yml
+RUN perl -i -pe 's/^#?\s*(callback_whitelist.*)/\1, foreman/' /etc/ansible/ansible.cfg
 
 COPY docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
