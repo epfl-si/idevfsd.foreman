@@ -137,7 +137,6 @@
     purge_networks: yes  ## No default network
     networks:
       - name: "{{ foreman_docker_network_name }}"
-  register: _foreman_frontend_container
 
 - name: "Wait for front-end to be operational"
   uri:
