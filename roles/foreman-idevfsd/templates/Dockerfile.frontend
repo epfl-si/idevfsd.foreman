@@ -17,6 +17,7 @@ RUN echo "gem 'foreman_bootdisk'" > bundler.d/foreman_bootdisk.rb
 RUN echo "gem 'foreman_discovery'" > bundler.d/foreman_discovery.rb
 RUN echo "gem 'activerecord-nulldb-adapter'" > bundler.d/nulldb.rb
 RUN echo "gem 'foreman_column_view'" > bundler.d/foreman_column_view.rb
+RUN echo "gem 'foreman_kubespray', :git => 'https://github.com/epfl-si/foreman_kubespray'" > bundler.d/foreman_kubespray.rb
 
 RUN bundle install
 
