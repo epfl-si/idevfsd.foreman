@@ -1,0 +1,13 @@
+- name: "Obtain content of the Kubespray playbook"
+  register: kubespray_playbooks
+  changed_when: false
+  shell:
+    cmd: |
+      docker exec {{ foreman_smartproxy_container_name }} cat /usr/share/kubespray/{{ item }}
+  with_items:
+    - cluster.yml
+    # Maybe we'll want more later.
+
+- set_fact:
+    kubespray_main_playbook: >-
+      {{ (kubespray_playbooks.results | selectattr("item", "equalto", "cluster.yml"))[0].stdout }}

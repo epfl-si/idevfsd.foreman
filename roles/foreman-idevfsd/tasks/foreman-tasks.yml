@@ -62,15 +62,14 @@
 
 - name: "“{{ foreman_kubespray_job_template_name }}” custom job template for ansible-runner"
   include_tasks:
-    file: foreman-config-kubespray-job-template.yml
+    file: foreman-kubespray.yml
     apply:
       tags:
-        - foreman.config.kubespray
+        - foreman.kubespray
   tags:
     - foreman
-    - foreman.config
-    - foreman.config.kubespray
-    - foreman.config.kubespray.jobtemplate
+    - foreman.kubespray
+    - foreman.kubespray.jobtemplate
 
 - include_vars:
     name: foreman_inventory
