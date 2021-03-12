@@ -17,7 +17,7 @@
     - foreman.frontend.image
     - foreman.frontend.dockerfile
 
-- name: "Homemade Ruby initializers"
+- name: "Homemade Ruby code"
   copy:
     src: "{{ item }}"
     dest: "{{ foreman_frontend_build_dir }}/{{ item }}"
@@ -100,6 +100,19 @@
       ## 2.3.2)
   tags: foreman.frontend.db_seed
 
+- when: foreman_kubespray_remote_git_path is defined
+  name: "Obtain vendor path for foreman_kubespray plugin"
+  changed_when: false
+  docker_container:
+    name: "foreman-{{ inventory_environment }}-kubespray-inspect"
+    image: "{{ foreman_frontend_image }}"
+    detach: no
+    cleanup: yes
+    command: >-
+      bash -c "echo -n /home/foreman/vendor/ruby/*/bundler/gems/foreman_kubespray-*"
+    container_default_behavior: no_defaults
+  register: _foreman_kubespray_gem_path
+
 - name: "Foreman front-end running in Docker"
   docker_container:
     name: "{{ foreman_frontend_container_name }}"
@@ -118,7 +131,11 @@
     log_options:
       max-size: 50m
       max-file: "3"
-    mounts: "{{ foreman_frontend_mounts }}"
+    mounts: >-
+      {{ foreman_frontend_mounts +
+         ( foreman_kubespray_developer_mounts if foreman_kubespray_remote_git_path is defined
+           else [] )
+      }}
     labels:
       traefik.enable: "true"
       traefik.docker.network: "{{ foreman_docker_network_name }}"
@@ -137,6 +154,20 @@
     purge_networks: yes  ## No default network
     networks:
       - name: "{{ foreman_docker_network_name }}"
+  vars:
+    foreman_kubespray_developer_mounts:
+      - type: bind
+        source: "{{ _safe_foreman_kubespray_remote_git_path }}"
+        target: "{{ _safe_foreman_kubespray_gem_path_container_Output | trim }}"
+        # Since foreman_kubespray_developer_mounts gets evaluated no
+    # matter what (even when we don't want it to be), we must be extra
+    # careful:
+    _safe_foreman_kubespray_gem_path_container_Output: >-
+      {{ _foreman_kubespray_gem_path.container.Output
+      | default('(unknown gem path in container)') }}
+    _safe_foreman_kubespray_remote_git_path: >-
+      {{ foreman_kubespray_remote_git_path
+      | default('(unknown remote git path)') }}
 
 - name: "Wait for front-end to be operational"
   uri:
