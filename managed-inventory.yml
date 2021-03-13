@@ -28,7 +28,7 @@ idevfsdesis:
       mac: 00:50:56:84:66:c7
       ip: 10.95.80.132
       parameters:
-        etcd_member_name: 1-itsidevfsd0009
+        etcd_member_name: 1-itsidevfsd0012
         kubespray_is_kube_master: true
 
     - name: itsidevfsd0009
