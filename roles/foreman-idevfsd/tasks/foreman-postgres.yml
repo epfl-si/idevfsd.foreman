@@ -1,3 +1,17 @@
+- name: 'Stop PostgreSQL database'
+  when: >-
+    "foreman.postgres.purge" in ansible_run_tags
+  docker_container:
+    name: "postgresql-{{ inventory_environment }}"
+    state: absent
+
+- name: 'Purge PostgreSQL data'
+  when: >-
+    "foreman.postgres.purge" in ansible_run_tags
+  file:
+    path: "{{ foreman_postgres_storage_dir }}"
+    state: absent
+
 - name: "PostgreSQL directories"
   file:
     path: "{{ item }}"
