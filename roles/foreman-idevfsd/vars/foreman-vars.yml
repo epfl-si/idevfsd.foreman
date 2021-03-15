@@ -7,6 +7,8 @@ foreman_postgres_initdb_sql_script: "{{ foreman_topdir }}/postgres/initdb.sql"
 
 foreman_version: 2.3.2
 foreman_tasks_version: 3.0.5  # 4.0.0 wants foreman_version = 2.4.0
+foreman_discovery_version: 16.3
+
 foreman_frontend_base_image: "quay.io/foreman/foreman:{{ foreman_version }}"
 foreman_frontend_build_dir: "{{ foreman_topdir }}/frontend/build"
 foreman_frontend_image: "epflidevfsd/foreman:{{ foreman_version }}"
@@ -71,6 +73,11 @@ foreman_default_install:
   operatingsystem: "Ubuntu 20.04"
   medium: "Ubuntu mirror"
   ptable: "Preseed default LVM"
+
+foreman_kexec_template_name: "EPFL Debian kexec"
+foreman_kexec_template_name_adapted_from_url: >-
+  https://raw.githubusercontent.com/theforeman/foreman_discovery/{{
+    foreman_discovery_version }}-stable/app/views/foreman_discovery/debian_kexec.erb
 
 # https://github.com/kubernetes-sigs/kubespray/blob/master/docs/vars.md
 foreman_hostgroup_ansible_vars:

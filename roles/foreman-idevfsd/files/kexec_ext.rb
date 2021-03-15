@@ -9,28 +9,11 @@ module IDEVFSD
 
     delegate_missing_to :@host
 
-    # We want to render templates using this object as @host
-    class Jail < ::Host::Managed::Jail
-    end
-
-    # Templates use @host as a string to build URLs etc. (and for
+    # View templates use @host as a string to build URLs etc. (and for
     # whatever reason, when it comes to to_s, delegate_missing_to
     # doesn't)
     def to_s
       @host.to_s
-    end
-
-    # Fill in discovery facts as if this were a discovered host.
-    # This is necessary for the default kexec template to do its
-    # job.
-    def facts
-      facts = @host.facts
-      facts['discovery_bootif'] = @host.mac
-      facts['discovery_ip'] = @host.ip
-      facts['discovery_netmask'] = @host.subnet.mask
-      facts['discovery_gateway'] = @host.subnet.gateway
-      facts['discovery_dns'] = @host.subnet.dns_primary
-      facts
     end
 
     # We never have “errors that may prevent whatever”
@@ -89,12 +72,13 @@ module IDEVFSD
     end
 
     def kexec!
-      json = @host.provisioning_template(:kind => 'kexec').render(host: wrapped_host)
+      template = @host.provisioning_template(:kind => 'kexec')
+      json = template.render(host: @host)
       ::ForemanDiscovery::NodeAPI::Power.service(:url => api_url).kexec(json)
     end
 
     def wrapped_host
-      @host.facts['discovery_ip'].nil? ? KexecableHost::new(@host) : @host
+      @host.is_a?(KexecableHost) ? @host : KexecableHost::new(@host)
     end
 
     def self.wrap_if_kexecable(host)
