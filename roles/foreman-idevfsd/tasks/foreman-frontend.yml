@@ -71,35 +71,6 @@
     and
     ("migrated" in _foreman_db_migrate.container.Output)
 
-- name: "`rake db:seed` (populate initial data)"
-  when: >-
-    (
-      (_foreman_db_migrate is defined)
-      and
-      (_foreman_db_migrate is changed)
-    )
-    or
-    ("foreman.frontend.db_seed" in ansible_run_tags)
-  docker_container:
-    name: "foreman_{{ inventory_environment }}_db_seed"
-    image: "{{ foreman_frontend_image }}"
-    detach: no
-    cleanup: yes
-    mounts: "{{ foreman_frontend_mounts }}"
-    command:
-      - bundle
-      - exec
-      - bin/rake
-      - db:seed
-    container_default_behavior: no_defaults
-    env:
-      ## RTFS @ https://github.com/theforeman/foreman/blob/develop/db/seeds.d/050-taxonomies.rb#L9
-      SEED_ORGANIZATION: "{{ foreman_main_organization_name }}"
-      SEED_LOCATION: "{{ foreman_main_location_name }}"
-      ## Fun fact: there are no other taxonomy types (as of Foreman
-      ## 2.3.2)
-  tags: foreman.frontend.db_seed
-
 - when: foreman_kubespray_remote_git_path is defined
   name: "Obtain vendor path for foreman_kubespray plugin"
   changed_when: false
@@ -121,11 +92,19 @@
     restart_policy: unless-stopped
     state: started
     restart: >-
-      {{ (_foreman_configuration_files is defined)
-         and
-         _foreman_configuration_files.results
-         and
-         (_foreman_configuration_files.results | any("changed"))
+      {{ (
+           (_foreman_db_migrate is defined)
+           and
+           (_foreman_db_migrate is changed)
+         )
+         or
+         (
+           (_foreman_configuration_files is defined)
+           and
+           _foreman_configuration_files.results
+           and
+           (_foreman_configuration_files.results | any("changed"))
+         )
       }}
     log_driver: json-file
     log_options:
@@ -149,6 +128,9 @@
     env:
       FOREMAN_ENV: production
       FOREMAN_BIND: tcp://0.0.0.0:3000
+      ## RTFS @ https://github.com/theforeman/foreman/blob/develop/db/seeds.d/050-taxonomies.rb#L9
+      SEED_ORGANIZATION: "{{ foreman_main_organization_name }}"
+      SEED_LOCATION: "{{ foreman_main_location_name }}"
     container_default_behavior: no_defaults
     networks_cli_compatible: no
     purge_networks: yes  ## No default network
