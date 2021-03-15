@@ -21,25 +21,35 @@ apt-get -qy update
 apt-get -qy install open-vm-tools
 
 # Make it possible to reinstall from Foreman using an ssh command
-apt-get -qy install ipxe
-perl -i -pe 's|GRUB_DEFAULT=.*|GRUB_DEFAULT=saved|' /etc/default/grub
-cat > /boot/ipxe.ipxe <<IPXE_SCRIPT
-#!ipxe
+apt-get -qy install jq kexec-tools
+cat >> /usr/local/sbin/foreman-reinstall <<'FOREMAN_REINSTALL'
+#!/bin/bash
 
-<% iface  = @host.interfaces.first %>
-ifopen net0
-set net0/ip <%= iface.ip %>
-set net0/netmask <%= iface.subnet.mask %>
-set net0/gateway <%= iface.subnet.gateway %>
-set dns <%= iface.subnet.dns_primary %>
+set -e -x
 
-chain {{ foreman_frontend_url | replace("https://", "http://") }}unattended/iPXE
+[ -n "$1" ] || {
+  echo >&2 "I'm sorry Dave, but I cannot let you do that."
+  exit 2
+}
 
-IPXE_SCRIPT
-update-grub
+tmpdir=/run/reboot
 
-cat >> /root/.bash_aliases <<ALIAS
-alias foreman-reinstall-on-next-reboot='grub-reboot "Network boot (iPXE)"'
-ALIAS
+rm -rf "$tmpdir" || true
+mkdir "$tmpdir"
+
+wget -O "$tmpdir"/params.json "<%= foreman_url('kexec').gsub(/token=.*/, '') %>token=$1"
+
+eval $(jq -r '. | to_entries | .[] | select(.value | type == "string")
+                | "kexec_" + .key + "=\"" + .value + "\""' < "$tmpdir"/params.json)
+
+wget -O "$tmpdir"/kernel "$kexec_kernel"
+wget -O "$tmpdir"/initram "$kexec_initram"
+
+kexec --force --debug --initrd="$tmpdir"/initram \
+      --append="$kexec_append" \
+      $(jq -r '.extra | .[] ' "$tmpdir"/params.json) "$tmpdir"/kernel
+
+FOREMAN_REINSTALL
+chmod 755 /usr/local/sbin/foreman-reinstall
 
 <%= snippet_if_exists(@host.hostgroup.to_s + " finish snippet") %>

@@ -1,7 +1,13 @@
 # coding: utf-8
 # Monkey-patch Foreman so that the “Reboot now” button kexec's when possible
 
+require 'timeout'
+require 'socket'
+
 module IDEVFSD
+  PING_TIMEOUT = 2
+  SSH_TIMEOUT = 20
+
   class KexecableHost
     def initialize(host)
       @host = host
@@ -62,19 +68,29 @@ module IDEVFSD
       "https://#{@host.ip}:8443"
     end
 
-    def ping?
-      inventory_api = ::ForemanDiscovery::NodeAPI::Inventory.new(:url => api_url)
-      begin
-        inventory_api.facter.include? "discovery_version"
-      rescue
-        false
+    def kexec_method
+      if ! ping?
+        return nil  # For speed
+      elsif can_discovery_api?
+        return :discovery_api
+      elsif can_ssh?
+        return :ssh
+      else
+        return nil
       end
     end
 
     def kexec!
-      template = @host.provisioning_template(:kind => 'kexec')
-      json = template.render(host: @host)
-      ::ForemanDiscovery::NodeAPI::Power.service(:url => api_url).kexec(json)
+      case kexec_method
+      when :discovery_api
+        kexec_discovery_api!
+      when :ssh
+        kexec_ssh!
+      when nil
+        raise "No way to tell #{@host.name} to kexec the installer at this time"
+      else
+        raise "Unknown kexec_method #{kexec_method}"
+      end
     end
 
     def wrapped_host
@@ -83,7 +99,105 @@ module IDEVFSD
 
     def self.wrap_if_kexecable(host)
       this = self.new(host)
-      this.ping? ? this.wrapped_host : host
+      this.kexec_method.nil? ? host : this.wrapped_host
+    end
+
+    private
+
+    def ping?
+      begin
+        Timeout.timeout(PING_TIMEOUT) do
+          s = TCPSocket.new(@host.ip, 8443)
+          s.close
+          return true
+        end
+      rescue Errno::ECONNREFUSED
+        return true
+      rescue Timeout::Error, Errno::ENETUNREACH, Errno::EHOSTUNREACH
+        return false
+      end
+    end
+
+    def can_discovery_api?
+      inventory_api = ::ForemanDiscovery::NodeAPI::Inventory.new(:url => api_url)
+      begin
+        inventory_api.facter.include? "discovery_version"
+        true
+      rescue => e
+        Rails.logger.error e
+        false
+      end
+    end
+
+    def can_ssh?
+      begin
+        dummy_command = KexecSshService.new(@host, "true").wait
+        dummy_command["result"] == "success"
+      rescue => e
+        Rails.logger.error e
+        false
+      end
+    end
+
+    def kexec_discovery_api!
+      template = @host.provisioning_template(:kind => 'kexec')
+      json = template.render(host: @host)
+      ::ForemanDiscovery::NodeAPI::Power.service(:url => api_url).kexec(json)
+    end
+
+    def kexec_ssh!
+      KexecSshService.new(@host, "/usr/local/sbin/foreman-reinstall #{@host.token.value}")
+    end
+
+    def start_ssh_task
+      dynflow.foo
+    end
+
+    class KexecSshService
+      def initialize(host, command)
+        smart_proxy = best_ssh_smart_proxy_for(host)
+        @dynflow = ProxyAPI::ForemanDynflow::DynflowProxy.new(:url => smart_proxy.url)
+        # https://github.com/theforeman/smart_proxy_remote_execution_ssh#usage
+        action_input = {
+            "task_id" => "ssh #{host.name} #{command}",
+            "script" => "#{command}",
+            "hostname" => "#{host.name}"
+          }
+        @task = @dynflow.trigger_task(
+          "ForemanRemoteExecutionCore::Actions::RunScript",
+          action_input)
+      end
+
+      def wait(timeout = SSH_TIMEOUT)
+        Timeout.timeout(timeout) do
+          while true do
+            stat = status
+            return stat if stat["result"] != "pending"
+            sleep 1
+          end
+        end
+      end
+
+      def status
+        @dynflow.status_of_task(@task["task_id"])
+      end
+
+      private
+
+      def best_ssh_smart_proxy_for(host)
+        proxies = host.remote_execution_proxies(:SSH)
+        for key in [:subnet, :fallback, :global] do
+          values = proxies[key]
+          if values.respond_to?(:first)
+            if ! values.first.nil?
+              return values.first
+            end
+          elsif ! values.nil?
+            return values
+          end
+        end
+        raise "Cannot find suitable smart proxy for ssh to #{host}"
+      end
     end
   end
 
