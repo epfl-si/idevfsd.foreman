@@ -2,10 +2,10 @@
  # See https://github.com/theforeman/foreman_column_view#configuration for details
  #}
 :column_view:
-  :etcd_member_name:
+  :kubespray_etcd_member_name:
     :title: etcd member name
     :after: last_report
-    :content: params['etcd_member_name']
+    :content: params['kubespray_etcd_member_name']
   :kubespray_is_kube_master:
     :title: kube master
     :after: etcd_member_name
