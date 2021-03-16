@@ -132,8 +132,14 @@ module IDEVFSD
     def can_ssh?
       begin
         dummy_command = KexecSshService.new(@host, "true").wait
-        dummy_command["result"] == "success"
+        if dummy_command["result"] == "success"
+          true
+        else
+          Rails.logger.error dummy_command
+          false
+        end
       rescue => e
+        Rails.logger.error "can_ssh?"
         Rails.logger.error e
         false
       end
@@ -169,12 +175,16 @@ module IDEVFSD
       end
 
       def wait(timeout = SSH_TIMEOUT)
-        Timeout.timeout(timeout) do
-          while true do
-            stat = status
-            return stat if stat["result"] != "pending"
-            sleep 1
+        begin
+          Timeout.timeout(timeout) do
+            while true do
+              stat = status
+              return stat if stat["result"] != "pending"
+              sleep 1
+            end
           end
+        rescue Timeout::Error
+          Rails.logger.error status
         end
       end
 
