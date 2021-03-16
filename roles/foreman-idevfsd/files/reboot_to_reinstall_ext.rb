@@ -1,5 +1,17 @@
 # coding: utf-8
-# Monkey-patch Foreman so that the “Reboot now” button kexec's when possible
+#
+# Monkey-patch Foreman so that the “Reboot now” button works, despite
+# the lack of BMC in VMs.
+#
+# Two different mechanisms are made available for this feature:
+#
+# - the discovery image's kexec API (the one that the “auto-provision“
+#   feature uses, except that in our case, we want to activate it
+#   from a “real” host, not a discovered host);
+#
+# - ssh'ing into the already-installed node to run the
+#   `/usr/local/sbin/foreman-reinstall` script (which may or may not
+#   wind up invoking kexec(8) as well)
 
 require 'timeout'
 require 'socket'
@@ -8,7 +20,7 @@ module IDEVFSD
   PING_TIMEOUT = 2
   SSH_TIMEOUT = 20
 
-  class KexecableHost
+  class ReinstallableHost
     def initialize(host)
       @host = host
     end
@@ -34,7 +46,7 @@ module IDEVFSD
 
     # ... albeit in our own kind of way
     def power
-      KexecablePower.new(@host)
+      ReinstallablePower.new(@host)
     end
   end
 
@@ -50,17 +62,17 @@ module IDEVFSD
     end
   end
 
-  class KexecablePower
+  class ReinstallablePower
     def initialize(host)
-      @service = KexecService.new(host)
+      @service = RebootToReinstallService.new(host)
     end
 
     def reset
-      @service.kexec!
+      @service.reinstall!
     end
   end
 
-  class KexecService
+  class RebootToReinstallService
     def initialize(host)
       @host = host
     end
@@ -68,38 +80,38 @@ module IDEVFSD
       "https://#{@host.ip}:8443"
     end
 
-    def kexec_method
+    def reinstall_method
       if ! ping?
         return nil  # For speed
-      elsif can_discovery_api?
+      elsif can_reinstall_via_discovery_api?
         return :discovery_api
-      elsif can_ssh?
+      elsif can_reinstall_via_ssh?
         return :ssh
       else
         return nil
       end
     end
 
-    def kexec!
-      case kexec_method
+    def reinstall!
+      case reinstall_method
       when :discovery_api
-        kexec_discovery_api!
+        reinstall_via_discovery_api!
       when :ssh
-        kexec_ssh!
+        reinstall_via_ssh!
       when nil
-        raise "No way to tell #{@host.name} to kexec the installer at this time"
+        raise "No way to tell #{@host.name} to run the installer at this time"
       else
-        raise "Unknown kexec_method #{kexec_method}"
+        raise "Unknown reinstall_method #{reinstall_method}"
       end
     end
 
     def wrapped_host
-      @host.is_a?(KexecableHost) ? @host : KexecableHost::new(@host)
+      @host.is_a?(ReinstallableHost) ? @host : ReinstallableHost::new(@host)
     end
 
-    def self.wrap_if_kexecable(host)
+    def self.wrap_if_reinstallable(host)
       this = self.new(host)
-      this.kexec_method.nil? ? host : this.wrapped_host
+      this.reinstall_method.nil? ? host : this.wrapped_host
     end
 
     private
@@ -118,7 +130,11 @@ module IDEVFSD
       end
     end
 
-    def can_discovery_api?
+    def foreman_reinstall_script_path
+      "/usr/local/sbin/foreman-reinstall"
+    end
+
+    def can_reinstall_via_discovery_api?
       inventory_api = ::ForemanDiscovery::NodeAPI::Inventory.new(:url => api_url)
       begin
         inventory_api.facter.include? "discovery_version"
@@ -129,37 +145,32 @@ module IDEVFSD
       end
     end
 
-    def can_ssh?
+    def can_reinstall_via_ssh?
       begin
-        dummy_command = KexecSshService.new(@host, "true").wait
-        if dummy_command["result"] == "success"
+        ls_status = SshService.new(@host, "ls -l #{foreman_reinstall_script_path}").wait
+        if ls_status["result"] == "success"
           true
         else
-          Rails.logger.error dummy_command
+          Rails.logger.error "can_reinstall_via_ssh? -> #{ls_status}"
           false
         end
       rescue => e
-        Rails.logger.error "can_ssh?"
         Rails.logger.error e
         false
       end
     end
 
-    def kexec_discovery_api!
+    def reinstall_via_discovery_api!
       template = @host.provisioning_template(:kind => 'kexec')
       json = template.render(host: @host)
       ::ForemanDiscovery::NodeAPI::Power.service(:url => api_url).kexec(json)
     end
 
-    def kexec_ssh!
-      KexecSshService.new(@host, "/usr/local/sbin/foreman-reinstall #{@host.token.value}")
+    def reinstall_via_ssh!
+      SshService.new(@host, "#{foreman_reinstall_script_path} #{@host.token.value}")
     end
 
-    def start_ssh_task
-      dynflow.foo
-    end
-
-    class KexecSshService
+    class SshService
       def initialize(host, command)
         smart_proxy = best_ssh_smart_proxy_for(host)
         @dynflow = ProxyAPI::ForemanDynflow::DynflowProxy.new(:url => smart_proxy.url)
@@ -215,16 +226,16 @@ module IDEVFSD
     extend ActiveSupport::Concern
 
     included do
-      before_action :wrap_host_if_kexecable,  :only => [:review_before_build, :setBuild]
-      before_action :wrap_hosts_if_kexecable, :only => [:submit_multiple_build]
+      before_action :wrap_host_if_reinstallable,  :only => [:review_before_build, :setBuild]
+      before_action :wrap_hosts_if_reinstallable, :only => [:submit_multiple_build]
     end
 
-    def wrap_host_if_kexecable
-      @host = KexecService::wrap_if_kexecable @host
+    def wrap_host_if_reinstallable
+      @host = RebootToReinstallService::wrap_if_reinstallable @host
     end
 
-    def wrap_hosts_if_kexecable
-      @hosts = @hosts.map { |h| KexecService::wrap_if_kexecable h }
+    def wrap_hosts_if_reinstallable
+      @hosts = @hosts.map { |h| RebootToReinstallService::wrap_if_reinstallable h }
     end
   end
 

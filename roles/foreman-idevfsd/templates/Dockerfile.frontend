@@ -85,6 +85,6 @@ COPY --from=kitchensink /home/foreman/public/ /home/foreman/public/
 COPY --from=kitchensink /home/foreman/db/ /home/foreman/db/
 
 COPY ip_from_request_env.rb app/controllers/concerns/foreman/controller/ip_from_request_env.rb
-COPY kexec_ext.rb config/initializers/
+COPY reboot_to_reinstall_ext.rb config/initializers/
 
 CMD busybox runsvdir -P /etc/service

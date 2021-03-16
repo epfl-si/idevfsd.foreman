@@ -22,7 +22,7 @@
     src: "{{ item }}"
     dest: "{{ foreman_frontend_build_dir }}/{{ item }}"
   with_items:
-    - kexec_ext.rb
+    - reboot_to_reinstall_ext.rb
     - ip_from_request_env.rb
   tags:
     - foreman.frontend.image
