@@ -158,39 +158,56 @@ module IDEVFSD
 
     class SshService
       def initialize(host, command)
-        smart_proxy = best_ssh_smart_proxy_for(host)
-        @dynflow = ProxyAPI::ForemanDynflow::DynflowProxy.new(:url => smart_proxy.url)
-        # https://github.com/theforeman/smart_proxy_remote_execution_ssh#usage
-        action_input = {
-            "task_id" => "ssh #{host.name} #{command}",
-            "script" => "#{command}",
-            "hostname" => "#{host.name}"
-          }
-        @task = @dynflow.trigger_task(
-          "ForemanRemoteExecutionCore::Actions::RunScript",
-          action_input)
+        @host = host
+        @command = command
+        @smart_proxy = best_ssh_smart_proxy_for(@host)
+
+        start_task
       end
 
       def wait(timeout = SSH_TIMEOUT)
         begin
           Timeout.timeout(timeout) do
             while true do
-              stat = status
-              return stat if stat["result"] != "pending"
-              sleep 1
+              status = fetch_status
+              if status["result"] == "pending"
+                sleep 1
+              elsif status.to_s.include?("Net::SSH::HostKeyMismatch") &&
+                    @host.drop_from_known_hosts(@smart_proxy.id)
+                start_task
+              else
+                return status
+              end
             end
           end
         rescue Timeout::Error
           Rails.logger.error status
-          stat
+          status
         end
       end
 
-      def status
+      private
+
+      def fetch_status
         @dynflow.status_of_task(@task["task_id"])
       end
 
-      private
+      ##
+      # Start or restart the task passed to the constructor
+
+      def start_task
+        @dynflow = ProxyAPI::ForemanDynflow::DynflowProxy.new(:url => @smart_proxy.url)
+        # https://github.com/theforeman/smart_proxy_remote_execution_ssh#usage
+        action_input = {
+            "task_id" => "ssh #{@host.name} #{@command}",
+            "script" => "#{@command}",
+            "hostname" => "#{@host.name}"
+          }
+        @task = @dynflow.trigger_task(
+          "ForemanRemoteExecutionCore::Actions::RunScript",
+          action_input)
+      end
+
 
       def best_ssh_smart_proxy_for(host)
         proxies = host.remote_execution_proxies(:SSH)
