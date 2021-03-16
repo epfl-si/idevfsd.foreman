@@ -81,15 +81,21 @@ module IDEVFSD
     end
 
     def reinstall_method
-      if ! ping?
-        return nil  # For speed
-      elsif can_reinstall_via_discovery_api?
-        return :discovery_api
-      elsif can_reinstall_via_ssh?
-        return :ssh
-      else
+      begin
+        Timeout.timeout(PING_TIMEOUT) do
+          return :discovery_api if can_reinstall_via_discovery_api?
+        end
+      rescue Errno::ECONNREFUSED
+        # Host is live, but port 8443 is closed. Carry on
+      rescue Timeout::Error, Errno::ENETUNREACH, Errno::EHOSTUNREACH
+        # Host is powered off or misconfigured from a network
+        # standpoint. Short-circuit the probe for speed
         return nil
       end
+
+      return :ssh if can_reinstall_via_ssh?
+
+      return nil
     end
 
     def reinstall!
@@ -116,33 +122,13 @@ module IDEVFSD
 
     private
 
-    def ping?
-      begin
-        Timeout.timeout(PING_TIMEOUT) do
-          s = TCPSocket.new(@host.ip, 8443)
-          s.close
-          return true
-        end
-      rescue Errno::ECONNREFUSED
-        return true
-      rescue Timeout::Error, Errno::ENETUNREACH, Errno::EHOSTUNREACH
-        return false
-      end
-    end
-
     def foreman_reinstall_script_path
       "/usr/local/sbin/foreman-reinstall"
     end
 
     def can_reinstall_via_discovery_api?
       inventory_api = ::ForemanDiscovery::NodeAPI::Inventory.new(:url => api_url)
-      begin
-        inventory_api.facter.include? "discovery_version"
-        true
-      rescue => e
-        Rails.logger.error e
-        false
-      end
+      inventory_api.facter.include? "discovery_version"
     end
 
     def can_reinstall_via_ssh?
@@ -196,6 +182,7 @@ module IDEVFSD
           end
         rescue Timeout::Error
           Rails.logger.error status
+          stat
         end
       end
 
