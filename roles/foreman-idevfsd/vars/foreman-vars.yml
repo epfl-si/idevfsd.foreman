@@ -98,7 +98,8 @@ foreman_hostgroup_ansible_vars:
   default_value: 23                # Leaving room for ~126 nodes running ~510 pods each
 - name: kubespray_enable_dual_stack_networks
   type: boolean
-  default_value: true
+  # If you want IPv6, then your nodes must have a true IPv6 address (not fe80::/32).
+  default_value: false
 - name: kube_pods_subnet_ipv6
   type: string
   # kubeadm doesn't believe in clusters with more than 65535 nodes (https://github.com/kubernetes/kubernetes/blob/master/cmd/kubeadm/app/constants/constants.go#L215):
