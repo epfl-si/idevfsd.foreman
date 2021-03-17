@@ -52,4 +52,11 @@ kexec --force --debug --initrd="$tmpdir"/initram \
 FOREMAN_REINSTALL
 chmod 755 /usr/local/sbin/foreman-reinstall
 
+# Kubespray-specific comfort settings
+cat > /etc/profile.d/etcd-env.sh << 'ETCD_ENV'
+if [ -r /etc/etcd.env ]; then
+  eval "$(perl -ne 'print if s/^ETCDCTL_/export ETCDCTL_/' /etc/etcd.env)"
+fi
+ETCD_ENV
+
 <%= snippet_if_exists(@host.hostgroup.to_s + " finish snippet") %>
