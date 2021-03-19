@@ -22,6 +22,8 @@ idevfsdesis:
       login: ponsfrilus
     - from: github
       login: greglebarbar
+    - from: github
+      login: multiscan
 
   hosts:
     - name: itsidevfsd0012
