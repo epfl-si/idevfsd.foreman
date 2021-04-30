@@ -6,7 +6,7 @@
 - name: "Dedicated Docker network for Foreman"
   gather_facts: no
   hosts:
-    - itsidevfsd0005
+    - dojo1
   tasks:
     - docker_network:
         name: "{{ foreman_docker_network_name }}"
@@ -15,7 +15,7 @@
 
 - name: Træfik
   hosts:
-    - itsidevfsd0005
+    - dojo1
   gather_facts: yes   ## Just for the FQDN
   roles:
     - role: roles/docker-traefik
@@ -32,7 +32,7 @@
 
 - name: Foreman server
   hosts:
-    - itsidevfsd0005
+    - dojo1
   gather_facts: yes   # Need FQDN too
   roles:
     - role: roles/foreman-idevfsd
@@ -41,7 +41,7 @@
 
 - name: Foreman remastered discovery image
   hosts:
-    - itsidevfsd0005
+    - dojo1
   gather_facts: no
   roles:
     - role: roles/foreman-discovery-remaster
