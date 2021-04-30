@@ -1,7 +1,7 @@
 ## Single-file inventory (no distinction between test and production)
 all:
   hosts:
-    itsidevfsd0005:
+    dojokube1:
       inventory_environment: test
       ansible_host: 10.92.104.103
       ansible_user: root
