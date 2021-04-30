@@ -2,7 +2,9 @@
 all:
   hosts:
     itsidevfsd0005:
-      inventory_environment: prod
-      ansible_host: itsidevfsd0005.xaas.epfl.ch
+      inventory_environment: test
+      ansible_host: 10.92.104.103
       ansible_user: root
       ansible_python_interpreter: python3
+
+

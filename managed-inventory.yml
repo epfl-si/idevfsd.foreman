@@ -42,3 +42,46 @@ idevfsdesis:
       ip: 10.95.80.84
       parameters:
         kubespray_is_kube_node: true
+
+
+zuzuesis:
+  domain: xaas.epfl.ch
+  subnet: 10.95.80.0/24
+
+  finish_snippet: |
+    echo "idevfsdesis was there."
+
+  root_ssh_keys:
+    - from: foreman
+    - from: github
+      login: domq
+    - from: github
+      login: ponsfrilus
+    - from: github
+      login: greglebarbar
+
+  hosts:
+    - name: itsidevfsd0012
+      mac: fa:ef:50:aa:9a:34
+      ip: 10.92.104.105
+      parameters:
+        kubespray_etcd_member_name: 1-itsidevfsd0012
+        kubespray_is_kube_master: true
+
+    - name: itsidevfsd0009
+      mac: 96:43:0a:4f:4e:0e
+      ip: 10.92.104.108
+      parameters:
+        kubespray_is_kube_node: true
+
+    - name: itsidevfsd0010
+      mac: 00:50:56:84:d6:a8
+      ip: 10.92.104.110
+      parameters:
+        kubespray_is_kube_node: true
+
+
+dojokube1 10.92.104.103 null 20210430.110345
+dojokube2 10.92.104.105 null 20210430.110350
+dojokube3 10.92.104.108 null 20210430.110341
+dojokube4 10.92.104.110 null 20210430.110351
