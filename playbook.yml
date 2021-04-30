@@ -3,6 +3,21 @@
   roles:
     - role: roles/docker-pip3
 
+- name: Install Docker
+  hosts: dojo1  # TODO: make a group, srlsly
+  gather_facts: yes
+  tasks:
+  - name: Add Docker GPG key
+    apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+  - name: Add Docker APT repository
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+  - name: Install list of packages
+    apt:
+      name: ['apt-transport-https','ca-certificates','curl','software-properties-common','docker-ce']
+      state: present
+      update_cache: yes
+
 - name: "Dedicated Docker network for Foreman"
   gather_facts: no
   hosts: all_foremen
