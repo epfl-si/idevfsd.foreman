@@ -5,7 +5,9 @@
     organizations: "{{ foreman_main_organization_name }}"
     locations: "{{ foreman_main_location_name }}"
 
-- name: "/24 subnets"
+- name: "/24 subnet(s) for {{ hostgroup_name }}"
+  when: >-
+    hostgroup.subnet | regex_search("/24$")
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.subnet:
     name: "{{ subnet }}.0/24"
@@ -18,6 +20,23 @@
     boot_mode: "Static"
   with_items: >-
     {{ (hostgroup.hosts | valuesets)["ip"] | subnets_24 }}
+  loop_control:
+    loop_var: subnet
+
+- name: "/16 subnet(s) for {{ hostgroup_name }}"
+  when: >-
+    hostgroup.subnet | regex_search("/16$")
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.subnet:
+    name: "{{ subnet }}.0.0/16"
+    network: "{{ subnet }}.0.0"
+    mask: "255.255.0.0"
+    gateway: "{{ subnet }}.0.1"
+    domains: "{{ hostgroup.domain }}"
+    dns_primary: 8.8.8.8
+    boot_mode: "Static"
+  with_items: >-
+    {{ (hostgroup.hosts | valuesets)["ip"] | subnets_16 }}
   loop_control:
     loop_var: subnet
 

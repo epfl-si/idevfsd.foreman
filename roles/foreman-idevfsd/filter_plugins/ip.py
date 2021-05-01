@@ -7,12 +7,21 @@ class FilterModule(object):
     def filters(self):
         return dict(
             subnets_24=subnets_24,
+            subnets_16=subnets_16,
             ipv6_ula=ipv6_ula)
 
 def subnets_24(ips):
     subnets = set()
     for ip in ips:
         matched = re.search(r"^(\d+\.\d+\.\d+)\.\d+$", ip)
+        if matched:
+            subnets.add(matched[1])
+    return list(subnets)
+
+def subnets_16(ips):
+    subnets = set()
+    for ip in ips:
+        matched = re.search(r"^(\d+\.\d+)\.\d+\.\d+$", ip)
         if matched:
             subnets.add(matched[1])
     return list(subnets)
