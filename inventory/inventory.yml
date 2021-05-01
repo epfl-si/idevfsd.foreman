@@ -2,13 +2,17 @@
 ## Note: only nodes running Foreman go here. The nodes actually
 ## running Kubernetes go into ../managed-inventory.yml
 all:
-  hosts:
-    itsidevfsd0005:
-      inventory_environment: prod
-      ansible_host: itsidevfsd0005.xaas.epfl.ch
-      ansible_user: root
-    zuzuesis1:
-      inventory_environment: prod
-      ansible_host: 10.92.104.103
-      ansible_user: root
-      ansible_python_interpreter: python3
+  children:
+    all_foremen:
+      hosts:
+        itsidevfsd0005:
+          inventory_dns_domain: xaas.epfl.ch
+          inventory_environment: prod
+          ansible_host: itsidevfsd0005.xaas.epfl.ch
+          ansible_user: root
+        dojo1:
+          inventory_dns_domain: 10-92-104-103.nip.io
+          inventory_environment: prod
+          ansible_host: 10.92.104.103
+          ansible_user: root
+          ansible_python_interpreter: python3

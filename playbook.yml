@@ -1,12 +1,11 @@
 - name: Docker API dependencies on the remote host
-  hosts: all
+  hosts: all_foremen
   roles:
     - role: roles/docker-pip3
 
 - name: "Dedicated Docker network for Foreman"
   gather_facts: no
-  hosts:
-    - itsidevfsd0005
+  hosts: all_foremen
   tasks:
     - docker_network:
         name: "{{ foreman_docker_network_name }}"
@@ -14,8 +13,7 @@
     - vars/global-vars.yml
 
 - name: Træfik
-  hosts:
-    - itsidevfsd0005
+  hosts: all_foremen
   gather_facts: yes   ## Just for the FQDN
   roles:
     - role: roles/docker-traefik
@@ -31,8 +29,7 @@
     traefik_http_on_https_port: true
 
 - name: Foreman server
-  hosts:
-    - itsidevfsd0005
+  hosts: all_foremen
   gather_facts: yes   # Need FQDN too
   roles:
     - role: roles/foreman-idevfsd
@@ -40,8 +37,7 @@
     - vars/global-vars.yml
 
 - name: Foreman remastered discovery image
-  hosts:
-    - itsidevfsd0005
+  hosts: all_foremen
   gather_facts: no
   roles:
     - role: roles/foreman-discovery-remaster
