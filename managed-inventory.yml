@@ -44,3 +44,50 @@ idevfsdesis:
       ip: 10.95.80.84
       parameters:
         kubespray_is_kube_node: true
+
+
+zuzuesis:
+  domain: node.consul
+  subnet: 10.92.0.0/16
+
+  finish_snippet: |
+    echo "idevfsdesis was there."
+
+  root_ssh_keys:
+    - from: foreman
+    - from: github
+      login: domq
+    - from: github
+      login: ponsfrilus
+    - from: github
+      login: greglebarbar
+    - from: github
+      login: multiscan
+    - from: github
+      login: zuzu59
+
+  hosts:
+    - name: dojokube2
+      mac: fa:ef:50:aa:9a:34
+      ip: 10.92.104.105
+      parameters:
+        kubespray_etcd_member_name: 1-dojokube2
+        kubespray_is_kube_master: true
+
+    - name: dojokube3
+      mac: 96:43:0a:4f:4e:0e
+      ip: 10.92.104.108
+      parameters:
+        kubespray_is_kube_node: true
+
+    - name: dojokube4
+      mac: 16:43:7b:4b:9c:ea
+      ip: 10.92.104.110
+      parameters:
+        kubespray_is_kube_node: true
+
+
+# dojokube1 10.92.104.103 null 20210430.110345
+# dojokube2 10.92.104.105 null 20210430.110350
+# dojokube3 10.92.104.108 null 20210430.110341
+# dojokube4 10.92.104.110 null 20210430.110351
