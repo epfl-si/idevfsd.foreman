@@ -10,6 +10,7 @@ all:
           inventory_environment: prod
           ansible_host: itsidevfsd0005.xaas.epfl.ch
           ansible_user: root
+          ansible_python_interpreter: python3
         dojo1:
           inventory_dns_domain: 10-92-104-103.nip.io
           inventory_environment: prod
