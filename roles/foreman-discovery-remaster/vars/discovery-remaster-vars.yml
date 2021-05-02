@@ -1,6 +1,15 @@
-discovery_source_image: /srv/vmware-isos/downloads/foreman-discovery-bootable-3.7.3.iso
-discovery_remastered_version: 2
-discovery_remastered_image: "/srv/vmware-isos/foreman-discovery-idevfsd-3.7.3-{{ discovery_remastered_version }}.iso"
+discovery_image_version: 3.7.5
+# Increment to work around CIFS locking shenanigans:
+discovery_remastered_version_suffix: 2
+
+discovery_source_url: https://downloads.theforeman.org/discovery/releases/3.7/fdi-bootable-{{ discovery_image_version }}.iso
+# From https://downloads.theforeman.org/discovery/releases/3.7/MD5SUMS
+discovery_source_md5sum: fe6d60c9019ca15d875e43a443f4e74e
+
+discovery_source_dir: /srv/vmware-isos/downloads
+discovery_source_image: "{{ discovery_source_dir }}/{{ discovery_source_url | basename }}"
+
+discovery_remastered_image: "/srv/vmware-isos/foreman-discovery-idevfsd-{{ discovery_image_version }}-{{ discovery_remastered_version_suffix }}.iso"
 
 discovery_remaster_tags:
   ## https://theforeman.org/plugins/foreman_discovery/15.0/index.html#3.1.5Discoveryimagekerneloptions
