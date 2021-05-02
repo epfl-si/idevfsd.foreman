@@ -44,26 +44,14 @@
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.hostgroup:
     name: "{{ hostgroup_name }}"
-    organization: >-
-      {{ hostgroup.organization
-         | default(foreman_main_organization_name) }}
-    locations: >-
-      {{ hostgroup.location
-         | default(foreman_main_location_name) }}
-    domain: "{{ hostgroup.domain }}"
-    subnet: "{{ hostgroup.subnet }}"
-    architecture: >-
-      {{ hostgroup.architecture
-         | default(foreman_default_install.architecture) }}
-    operatingsystem: >-
-      {{ hostgroup.operatingsystem
-         | default(foreman_default_install.operatingsystem) }}
-    medium: >-
-      {{ hostgroup.medium
-         | default(foreman_default_install.medium) }}
-    ptable: >-
-      {{ hostgroup.ptable
-         | default(foreman_default_install.ptable) }}
+    organization:    "{{ foreman_hostgroup_params.organization }}"
+    locations:       "{{ foreman_hostgroup_params.locations }}"
+    domain:          "{{ foreman_hostgroup_params.domain }}"
+    subnet:          "{{ foreman_hostgroup_params.subnet }}"
+    architecture:    "{{ foreman_hostgroup_params.architecture }}"
+    operatingsystem: "{{ foreman_hostgroup_params.operatingsystem }}"
+    medium:          "{{ foreman_hostgroup_params.medium }}"
+    ptable:          "{{ foreman_hostgroup_params.ptable }}"
     parameters: "{{ fixed_parameters + managed_parameters | from_yaml }}"
   vars:
     ssh_keys: >-
@@ -106,12 +94,20 @@
       {{ item.mac | default(None) }}
     ip: >-
       {{ item.ip  | default(None) }}
+    # These parameters are inherited from the host group at creation
+    # time (see `initialize` method in app/models/host/managed.rb line
+    # 78). Unfortunately this means we have to enforce them again
+    # here, lest when we change an already existing host group with
+    # existing hosts, the change won't trickle down to the latter:
+    architecture:    "{{ foreman_hostgroup_params.architecture }}"
+    operatingsystem: "{{ foreman_hostgroup_params.operatingsystem }}"
+    medium:          "{{ foreman_hostgroup_params.medium }}"
+    ptable:          "{{ foreman_hostgroup_params.ptable }}"
+    subnet:          "{{ foreman_hostgroup_params.subnet }}"
     organization: >-
       {{ hostgroup.organization
          | default(foreman_main_organization_name) }}
     location: >-
       {{ hostgroup.location
          | default(foreman_main_location_name) }}
-    operatingsystem: Ubuntu 20.04
-    architecture: x86_64
     parameters: "{{ item.parameters | as_foreman_parameters }}"

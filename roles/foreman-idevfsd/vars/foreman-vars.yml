@@ -68,16 +68,41 @@ foreman_api_environment:
 foreman_main_organization_name: IDEV-FSD
 foreman_main_location_name: XaaS Prod
 
-foreman_default_install:
-  architecture: "x86_64"
-  operatingsystem: "Ubuntu 20.04"
-  medium: "Ubuntu mirror"
-  ptable: "Preseed default LVM"
+foreman_ptable_template_name: "IC-IT style preseed LVM partition table"
 
 foreman_kexec_template_name: "EPFL Debian kexec"
 foreman_kexec_template_name_adapted_from_url: >-
   https://raw.githubusercontent.com/theforeman/foreman_discovery/{{
     foreman_discovery_version }}-stable/app/views/foreman_discovery/debian_kexec.erb
+
+
+foreman_default_install:
+  architecture: "x86_64"
+  operatingsystem: "Ubuntu 20.04"
+  medium: "Ubuntu mirror"
+  ptable: "{{ foreman_ptable_template_name }}"
+
+foreman_hostgroup_params:
+  organization: >-
+    {{ hostgroup.organization
+       | default(foreman_main_organization_name) }}
+  locations: >-
+    {{ hostgroup.location
+       | default(foreman_main_location_name) }}
+  domain: "{{ hostgroup.domain }}"
+  subnet: "{{ hostgroup.subnet }}"
+  architecture: >-
+    {{ hostgroup.architecture
+       | default(foreman_default_install.architecture) }}
+  operatingsystem: >-
+    {{ hostgroup.operatingsystem
+       | default(foreman_default_install.operatingsystem) }}
+  medium: >-
+    {{ hostgroup.medium
+       | default(foreman_default_install.medium) }}
+  ptable: >-
+    {{ hostgroup.ptable
+       | default(foreman_default_install.ptable) }}
 
 # https://github.com/kubernetes-sigs/kubespray/blob/master/docs/vars.md
 foreman_hostgroup_ansible_vars:

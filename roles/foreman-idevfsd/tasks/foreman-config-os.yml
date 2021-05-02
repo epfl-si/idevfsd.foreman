@@ -10,6 +10,18 @@
       - PyYAML
     state: latest
 
+- name: "{{ foreman_ptable_template_name }}"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.partition_table:
+    name: "{{ foreman_ptable_template_name }}"
+    os_family: Debian
+    layout: >-
+      {{ lookup("template", "IC-IT-style-preseed-lvm-partition-table.erb") }}
+    organizations:
+      - "{{ foreman_main_organization_name }}"
+    locations:
+      - "{{ foreman_main_location_name }}"
+
 - name: "{{ foreman_kexec_template_name }}"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.provisioning_template:
@@ -41,7 +53,7 @@
     media:
       - "Ubuntu mirror"
     ptables:
-      - "Preseed default LVM"
+      - "{{ foreman_ptable_template_name }}"
     provisioning_templates:
       - "{{ foreman_kexec_template_name }}"
       - "Preseed default iPXE"
