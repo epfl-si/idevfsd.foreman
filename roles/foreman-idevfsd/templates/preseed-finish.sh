@@ -1,5 +1,22 @@
 set -e -x
 
+# Add missing lines for swap partitions to /etc/fstab
+for device in $(blkid -o device); do
+    (
+        eval "$(blkid -o export $device)"
+        if [ "$TYPE" != "swap" ]; then exit 0; fi
+        if [ -z "$UUID" ]; then exit 0; fi
+        if grep -qw "$DEVNAME" /etc/fstab; then exit 0; fi
+        if grep -qw "$UUID" /etc/fstab; then exit 0; fi
+        case "$device" in
+            /dev/mapper/*)
+                echo -e "$device\tswap\tswap\tdefaults\t0\t0" >> /etc/fstab ;;
+            *)
+                echo -e "UUID=$UUID\tswap\tswap\tdefaults\t0\t0" >> /etc/fstab ;;
+        esac
+    )
+done
+
 <% if !( host_param('epfl_root_authorized_keys').blank? ||
          host_param('epfl_root_authorized_keys').strip.empty? ) %>
 # Add ssh keys from Foreman's 'epfl_root_authorized_keys' host / hostgroup parameter
