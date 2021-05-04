@@ -67,20 +67,17 @@ d-i partman-partitioning/choose_label string <%= host_param('partitioning-disk-l
 d-i partman-partitioning/default_label string <%= host_param('partitioning-disk-label') %>
 <% end -%>
 
-# You can choose one of the three predefined partitioning recipes:
-# - atomic: all files in one partition
-# - home:   separate /home partition
-# - multi:  separate /home, /var, and /tmp partitions (/usr was removed in jessie)
-d-i partman-auto/choose_recipe select <%= partitioning_recipe %>
-
-<% if partitioning_expert_recipe != '' -%>
-# Or provide a recipe of your own...
-# If you have a way to get a recipe file into the d-i environment, you can
-# just point at it.
-d-i partman-auto/expert_recipe string \
-<%= partitioning_expert_recipe.gsub(/(?:\n\r?|\r\n?)/, " \\\n") %>
-
-<% end -%>
+<%# https://serverfault.com/a/731213/109290 %>
+d-i partman-auto/expert_recipe string myexpertrecipe :: \
+  400 400 400 free $iflabel{ gpt } method{ efi } format{ } . \
+  100% 2048 100% linux-swap $lvmok{ } lv_name{ swap } label{ swap } method{ swap } format{ } . \
+<%# The numbers after the +'s are claim amounts for additional disk
+  # space, expressed in percentage points (i.e. / gets 5% of any leftover
+  # space, and /var/lib/docker gets the rest). For more explanations, see
+  # https://www.bishnet.net/tim/blog/2015/01/29/understanding-partman-autoexpert_recipe/
+  -%>
+  1024 <%= 1024 + 95 %> -1 ext4  $lvmok{ } lv_name{ docker } label{ docker } method{ format } format{ } use_filesystem{ } filesystem{ ext4 } mountpoint{ /var/lib/docker } . \
+  6144 <%= 6144 + 5  %> -1 ext4  $lvmok{ } lv_name{ root }   label{ root }   method{ format } format{ } use_filesystem{ } filesystem{ ext4 } mountpoint{ / } .
 
 # If you just want to change the default filesystem to something
 # else, you can do that without providing a full recipe.
