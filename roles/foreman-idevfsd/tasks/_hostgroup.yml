@@ -33,7 +33,8 @@
     mask: "255.255.0.0"
     gateway: "{{ subnet }}.0.1"
     domains: "{{ hostgroup.domain }}"
-    dns_primary: 8.8.8.8
+    dns_primary: 128.178.15.227
+    dns_secondary: 128.178.15.228
     boot_mode: "Static"
   with_items: >-
     {{ (hostgroup.hosts | valuesets)["ip"] | subnets_16 }}
