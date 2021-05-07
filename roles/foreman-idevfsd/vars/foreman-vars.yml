@@ -68,6 +68,13 @@ foreman_api_environment:
 foreman_main_organization_name: IDEV-FSD
 foreman_main_location_name: XaaS Prod
 
+foreman_ldap_name: "EPFL LDAP"
+foreman_ldap_host: "ldap.epfl.ch"
+foreman_ldap_tls: true
+foreman_ldap_port: 636
+foreman_ldap_base_dn: "o=epfl,c=ch"
+foreman_ldap_auth_groups_base: "ou=idev-fsd,ou=idev,ou=vpo-si,o=epfl,c=ch"
+
 foreman_ptable_template_name: "IC-IT style preseed LVM partition table"
 
 foreman_kexec_template_name: "EPFL Debian kexec"
