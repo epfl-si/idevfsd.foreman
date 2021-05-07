@@ -103,6 +103,12 @@ foreman_hostgroup_params:
   ptable: >-
     {{ hostgroup.ptable
        | default(foreman_default_install.ptable) }}
+  dns_primary: >-
+    {{ hostgroup.dns_primary | default("128.178.15.227") }}
+  dns_secondary: >-
+    {{ hostgroup.dns_secondary   if hostgroup.dns_secondary is defined
+       else None                 if hostgroup.dns_primary is defined
+       else "128.178.15.228" }}
 
 # https://github.com/kubernetes-sigs/kubespray/blob/master/docs/vars.md
 foreman_hostgroup_ansible_vars:

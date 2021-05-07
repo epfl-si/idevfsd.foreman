@@ -49,6 +49,7 @@ idevfsdesis:
 zuzuesis:
   domain: node.consul
   subnet: 10.92.0.0/16
+  dns_primary: 10.92.103.53
 
   finish_snippet: |
     echo "idevfsdesis was there."
