@@ -88,7 +88,7 @@ zuzuesis:
         kubespray_is_kube_node: true
 
 
-# dojokube1 10.92.104.103 null 20210430.110345
-# dojokube2 10.92.104.105 null 20210430.110350
-# dojokube3 10.92.104.108 null 20210430.110341
-# dojokube4 10.92.104.110 null 20210430.110351
+# dojokube1 10.92.104.103 null 20210430.110345 a6:a8:42:9e:db:9a
+# dojokube2 10.92.104.105 null 20210430.110350 fa:ef:50:aa:9a:34
+# dojokube3 10.92.104.108 null 20210430.110341 96:43:0a:4f:4e:0e
+# dojokube4 10.92.104.110 null 20210430.110351 16:43:7b:4b:9c:ea
