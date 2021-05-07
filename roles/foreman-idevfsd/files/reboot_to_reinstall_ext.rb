@@ -17,7 +17,7 @@ require 'timeout'
 require 'socket'
 
 module IDEVFSD
-  PING_TIMEOUT = 2
+  PING_TIMEOUT = 5
   SSH_TIMEOUT = 20
 
   class ReinstallableHost
