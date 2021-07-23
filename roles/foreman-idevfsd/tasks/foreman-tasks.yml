@@ -43,9 +43,11 @@
       tags:
         - foreman
         - foreman.config
+        - foreman.config.ldap
   tags:
     - foreman
     - foreman.config
+    - foreman.config.ldap
 
 - name: "Foreman configuration - Settings related to OSes and installation"
   include_tasks:

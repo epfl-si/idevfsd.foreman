@@ -9,6 +9,25 @@
       admin.save
     recheck: yes
 
+- name: "{{ foreman_ldap_name }} Authentication with automatic registration"
+  environment: "{{ foreman_api_environment }}"
+  theforeman.foreman.auth_source_ldap:
+    name: "{{ foreman_ldap_name }}"
+    host: "{{ foreman_ldap_host }}"
+    tls: "{{ foreman_ldap_tls }}"
+    port: "{{ foreman_ldap_port }}"
+    onthefly_register: true
+    base_dn: "{{ foreman_ldap_base_dn }}"
+    groups_base: "{{ foreman_ldap_auth_groups_base }}"
+    server_type: free_ipa
+    attr_login: uid
+    attr_firstname: givenName
+    attr_lastname: sn
+    attr_mail: mail
+    state: present
+  tags:
+    - foreman.config.ldap
+
 - name: "Connect to smart proxy"
   environment: "{{ foreman_api_environment }}"
   theforeman.foreman.smart_proxy:
